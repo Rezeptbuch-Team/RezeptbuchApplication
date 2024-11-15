@@ -3,23 +3,36 @@ using ApplicationCore.Common.Types;
 
 namespace ApplicationCore.Model;
 
-public class OnlineAPIHandler() : IOnlineAPIHandler
+public class OnlineAPIHandler : IOnlineAPIHandler
 {
 
     public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
         string baseUrl = "localhost";  // replace with configuration later on
         string endpointUrl = baseUrl + "\\list";
+        string url = $"{endpointUrl}\\list?";
         
-        string orderByParam;
-        if (filter.orderBy == OrderBy.TITLE) {
-            orderByParam = "title";
-        } else {
-            orderByParam = "cooking_time";
+        url += "count=" + filter.count.ToString() + "&";
+        url += "offset=" + filter.offset.ToString() + "&";
+        if (filter.orderBy == OrderBy.COOKINGTIME) {
+            url += "order_by=cooking_time&";
         }
-        string url = $"{endpointUrl}\\list?order_by={orderByParam}";
+        if (filter.order == Order.DESCENDING) {
+            url += "order=desc&";
+        }
+        if (filter.categories.Count > 0) {
+            url += "categories=";
+            for (int i = 0; i < filter.categories.Count; i++) {
+                url += filter.categories;
+                if (i < filter.categories.Count - 1) {
+                    url += ",";
+                }
+            }
+        }
 
         using HttpClient httpClient = new();
         HttpResponseMessage response = await httpClient.GetAsync(url);
+        // json handling
+        // extraction into recipe entries
 
         List<string> categories = ["category1", "category2"];
         RecipeEntry recipeEntry1 = new("hash", "title", "description", "imagePath", categories, 15);
