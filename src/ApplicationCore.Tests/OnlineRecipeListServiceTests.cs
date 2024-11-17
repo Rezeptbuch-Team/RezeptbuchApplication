@@ -8,7 +8,10 @@ namespace ApplicationCore.Tests;
 
 public class OnlineRecipeListServiceTests
 {
+#pragma warning disable CS8618
     OnlineRecipeListService onlineRecipeListService;
+#pragma warning restore CS8618
+
     private string exampleJson = @"{
     ""recipes"": [{
         ""hash"": ""asdafc"",

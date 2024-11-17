@@ -7,17 +7,17 @@ namespace ApplicationCore.Model;
 // classes for json deserialization
 public class Recipe
     {
-        public string hash { get; set; }
-        public string title { get; set; }
-        public string description { get; set; }
-        public string image_path { get; set; }
-        public List<string> categories { get; set; }
+        public required string hash { get; set; }
+        public required string title { get; set; }
+        public required string description { get; set; }
+        public required string image_path { get; set; }
+        public required List<string> categories { get; set; }
         public int cooking_time { get; set; }
     }
 
 public class Root
 {
-    public List<Recipe> recipes { get; set; }
+    public required List<Recipe> recipes { get; set; }
 }
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
