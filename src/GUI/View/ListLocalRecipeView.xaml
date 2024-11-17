@@ -2,9 +2,29 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GUI.View.ListLocalRecipeView">
+             x:Class="GUI.View.ListLocalRecipeView"
+             xmlns:viewmodel="clr-namespace:GUI.ViewModel"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             x:DataType="viewmodel:ListLocalRecipeViewModel">
     <ContentPage.Content>
-        <Label
-            Text="List"/>
+        <Grid
+            RowDefinitions="100, *">
+            <Grid
+                Grid.Row="0">
+            </Grid>
+            <ScrollView
+                Grid.Row="1"
+                Margin="20">
+                <StackLayout>
+                    <BindableLayout.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Recipe1</x:String>
+                            <x:String>Recipe2</x:String>
+                            <x:String>Recipe3</x:String>
+                        </x:Array>
+                    </BindableLayout.ItemsSource>
+                </StackLayout>
+            </ScrollView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
