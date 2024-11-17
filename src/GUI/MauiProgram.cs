@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using ApplicationCore.Model;
 using ApplicationCore.Interfaces;
+using GUI.View;
+using GUI.ViewModel;
 
 namespace GUI;
 
@@ -22,10 +24,15 @@ public static class MauiProgram
 			client.BaseAddress = new Uri("localhost" + "/list/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
 
-
-#if DEBUG
-		builder.Logging.AddDebug();
-#endif
+		// add Views and ViewModels
+		builder.Services.AddSingleton<LandingPageView>();
+		builder.Services.AddSingleton<LandingPageViewModel>();
+		builder.Services.AddTransient<ListLocalRecipeView>();
+		builder.Services.AddTransient<ListLocalRecipeViewModel>();
+		
+		#if DEBUG
+				builder.Logging.AddDebug();
+		#endif
 
 		return builder.Build();
 	}
