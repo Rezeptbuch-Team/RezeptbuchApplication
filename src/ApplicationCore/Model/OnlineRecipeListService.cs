@@ -8,15 +8,15 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     public string BuildUrl(Filter filter) {
         string url = "?";
         url += "count=" + filter.count.ToString() + "&";
-        url += "offset=" + filter.offset.ToString() + "&";
+        url += "offset=" + filter.offset.ToString();
         if (filter.orderBy == OrderBy.COOKINGTIME) {
-            url += "order_by=cooking_time&";
+            url += "&order_by=cooking_time&";
         }
         if (filter.order == Order.DESCENDING) {
-            url += "order=desc&";
+            url += "&order=desc";
         }
         if (filter.categories.Count > 0) {
-            url += "categories=";
+            url += "&categories=";
             for (int i = 0; i < filter.categories.Count; i++) {
                 url += filter.categories[i];
                 if (i < filter.categories.Count - 1) {
