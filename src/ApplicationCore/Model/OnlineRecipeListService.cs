@@ -1,7 +1,24 @@
 ﻿using ApplicationCore.Interfaces;
 using ApplicationCore.Common.Types;
+using System.Text.Json;
 
 namespace ApplicationCore.Model;
+
+// classes for json deserialization
+public class Recipe
+    {
+        public string hash { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string image_path { get; set; }
+        public List<string> categories { get; set; }
+        public int cooking_time { get; set; }
+    }
+
+public class Root
+{
+    public List<Recipe> recipes { get; set; }
+}
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
 {
@@ -30,13 +47,18 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
         string url = BuildUrl(filter);
 
+        List<RecipeEntry> recipes = [];
         HttpResponseMessage response = await httpClient.GetAsync(url);
-        // json handling
-        // extraction into recipe entries
-
-        List<string> categories = ["category1", "category2"];
-        RecipeEntry recipeEntry1 = new("hash", "title", "description", "imagePath", categories, 15);
-        RecipeEntry recipeEntry2 = new("hash2", "title2", "description2", "imagePath2", categories, 30);
-        return [recipeEntry1, recipeEntry2];
+        if (response.IsSuccessStatusCode) {
+            string json = await response.Content.ReadAsStringAsync();
+            Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
+            
+            foreach (Recipe recipeEntry in extractedRoot.recipes) {
+                recipes.Add(new RecipeEntry(recipeEntry.hash,
+                recipeEntry.title, recipeEntry.description, recipeEntry.image_path, recipeEntry.categories,
+                recipeEntry.cooking_time));
+            }
+        }
+        return recipes;
     }
 }
