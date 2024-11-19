@@ -7,19 +7,19 @@ namespace GUI.ViewModel;
 
 public partial class ListLocalRecipeViewModel : ObservableObject
 {
-
-    public class Recipe(string Titel, string Description);
     
     public ListLocalRecipeViewModel()
     {
+        Text = "Test DataBinding";
         Recipes = new();
-        List<string> categories = new();
         for (int i = 0; i < 10; i++)
         {
-            Recipes.Add(new Recipe($"Titel {i}", $"Description {i}"));
+            Recipes.Add($"Titel {i}, Description {i}");
         }
     }
     
     [ObservableProperty] 
-    private ObservableCollection<Recipe> recipes;
+    private ObservableCollection<string> recipes;
+
+    [ObservableProperty] private string text;
 }

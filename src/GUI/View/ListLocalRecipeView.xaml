@@ -11,20 +11,14 @@
             RowDefinitions="100, *">
             <Grid
                 Grid.Row="0">
+                <Label
+                    Text="{Binding Text}"/>
             </Grid>
-            <ScrollView
+            <ListView
                 Grid.Row="1"
-                Margin="20">
-                <StackLayout>
-                    <BindableLayout.ItemsSource>
-                        <x:Array Type="{x:Type x:String}">
-                            <x:String>Recipe1</x:String>
-                            <x:String>Recipe2</x:String>
-                            <x:String>Recipe3</x:String>
-                        </x:Array>
-                    </BindableLayout.ItemsSource>
-                </StackLayout>
-            </ScrollView>
+                ItemsSource="{Binding Recipes}">
+                
+            </ListView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
