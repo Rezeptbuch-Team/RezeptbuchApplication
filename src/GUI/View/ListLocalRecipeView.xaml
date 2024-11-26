@@ -5,6 +5,7 @@
              x:Class="GUI.View.ListLocalRecipeView"
              xmlns:viewmodel="clr-namespace:GUI.ViewModel"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:types="clr-namespace:ApplicationCore.Common.Types;assembly=ApplicationCore"
              x:DataType="viewmodel:ListLocalRecipeViewModel">
     <ContentPage.Content>
         <Grid
@@ -17,7 +18,25 @@
             <ListView
                 Grid.Row="1"
                 ItemsSource="{Binding Recipes}">
-                
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell
+                            x:DataType="types:Recipe">
+                            <Grid
+                                ColumnDefinitions="25, 100, *">
+                                <Label
+                                    Grid.Column="0"
+                                    Text="{Binding Path=Hash}"/>
+                                <Label
+                                    Grid.Column="1"
+                                    Text="{Binding Path=Title}"/>
+                                <Label
+                                    Grid.Column="2"
+                                    Text="{Binding Path=Description}"/>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </Grid>
     </ContentPage.Content>
