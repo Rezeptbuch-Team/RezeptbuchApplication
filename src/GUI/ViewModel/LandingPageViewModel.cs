@@ -7,7 +7,7 @@ namespace GUI.ViewModel;
 public partial class LandingPageViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string text = "Landing Page";
+    private string _text = "Landing Page";
     
     
     [RelayCommand]
