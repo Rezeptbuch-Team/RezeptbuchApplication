@@ -10,5 +10,5 @@ public partial class NavigateThroughRecipeViewModel : ObservableObject
     }
     
     [ObservableProperty] 
-    private string stepDescription;
+    private string _stepDescription;
 }
