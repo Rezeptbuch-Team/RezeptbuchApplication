@@ -25,10 +25,14 @@ public static class MauiProgram
 		});
 
 		// add Views and ViewModels
-		builder.Services.AddSingleton<LandingPageView>();
-		builder.Services.AddSingleton<LandingPageViewModel>();
 		builder.Services.AddTransient<ListLocalRecipeView>();
 		builder.Services.AddTransient<ListLocalRecipeViewModel>();
+
+		builder.Services.AddTransient<ListRemoteRecipeView>();
+
+		builder.Services.AddTransient<NavigateThroughRecipeView>();
+
+		builder.Services.AddTransient<CreateRecipeView>();
 		
 		#if DEBUG
 				builder.Logging.AddDebug();

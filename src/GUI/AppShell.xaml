@@ -6,7 +6,30 @@
     xmlns:view="clr-namespace:GUI.View"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        ContentTemplate="{DataTemplate view:LandingPageView}"
-        Route="LandingPageView"/>
+    <TabBar>
+        <Tab
+            Title="Local">
+            <ShellContent 
+                ContentTemplate="{DataTemplate view:ListLocalRecipeView}"
+                Route="ListLocalRecipeView"/>
+        </Tab>
+        <Tab
+            Title="Remote">
+            <ShellContent 
+                ContentTemplate="{DataTemplate view:ListRemoteRecipeView}"
+                Route="ListRemoteRecipeView"/>
+        </Tab>
+        <Tab
+            Title="Navigate">
+            <ShellContent 
+                ContentTemplate="{DataTemplate view:NavigateThroughRecipeView}"
+                Route="NavigateThroughRecipeView"/>
+        </Tab>
+        <Tab
+            Title="Create">
+            <ShellContent 
+                ContentTemplate="{DataTemplate view:CreateRecipeView}"
+                Route="CreateRecipeView"/>
+        </Tab>
+    </TabBar>
 </Shell>

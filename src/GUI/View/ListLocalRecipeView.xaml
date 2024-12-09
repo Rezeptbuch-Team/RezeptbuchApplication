@@ -4,7 +4,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GUI.View.ListLocalRecipeView"
              xmlns:viewmodel="clr-namespace:GUI.ViewModel"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:types="clr-namespace:ApplicationCore.Common.Types;assembly=ApplicationCore"
              x:DataType="viewmodel:ListLocalRecipeViewModel">
     <ContentPage.Content>
