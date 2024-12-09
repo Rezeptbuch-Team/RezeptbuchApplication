@@ -9,7 +9,6 @@ public partial class ListRemoteRecipeViewModel : ObservableObject
     public ListRemoteRecipeViewModel()
     {
         Recipes = new();
-        List<string> list = new();
         for (int i = 0; i < 10; i++)
         {
             Recipes.Add(new Recipe(i.ToString(), $"Title {i}", $"Description {i}"));
@@ -17,5 +16,5 @@ public partial class ListRemoteRecipeViewModel : ObservableObject
     }
     
     [ObservableProperty] 
-    private ObservableCollection<Recipe> recipes;
+    private ObservableCollection<Recipe> _recipes;
 }
