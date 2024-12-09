@@ -2,8 +2,34 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GUI.View.NavigateThroughRecipeView">
+             x:Class="GUI.View.NavigateThroughRecipeView"
+             xmlns:viewModel="clr-namespace:GUI.ViewModel"
+             x:DataType="viewModel:NavigateThroughRecipeViewModel">
     <ContentPage.Content>
-        
+        <Grid
+            RowDefinitions="60, 60, *"
+            RowSpacing="10">
+            <Label
+                Grid.Row="0"
+                Text="Recipe Name"/>
+            <Label
+                Grid.Row="1"
+                Text="Step Number"/>
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="60, *, 60"
+                ColumnSpacing="10">
+                <Button
+                    Grid.Column="0"
+                    Text="Back"/>
+                <Label
+                    Grid.Column="1"
+                    Text="{Binding StepDescription}"
+                    VerticalTextAlignment="Center"/>
+                <Button
+                    Grid.Column="2"
+                    Text="Next"/>
+            </Grid>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

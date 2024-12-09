@@ -32,6 +32,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ListRemoteRecipeViewModel>();
 
 		builder.Services.AddTransient<NavigateThroughRecipeView>();
+		builder.Services.AddTransient<NavigateThroughRecipeViewModel>();
 
 		builder.Services.AddTransient<CreateRecipeView>();
 		
