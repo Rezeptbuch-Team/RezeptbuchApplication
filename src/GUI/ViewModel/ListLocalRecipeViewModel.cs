@@ -13,7 +13,7 @@ public partial class ListLocalRecipeViewModel : ObservableObject
 
         Text = "Test DataBinding";
         Recipes = new();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             Recipes.Add(new Recipe(i.ToString(), $"Title {i}", $"Description {i}"));
         }
