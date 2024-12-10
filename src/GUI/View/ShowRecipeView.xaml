@@ -25,7 +25,7 @@
                         Text="{Binding RecipeName}"/>
                     <Label
                         Grid.Row="1"
-                        Text="{Binding RecipeTime}"/>
+                        Text="{Binding Path=RecipeTime, StringFormat='Time: {0} minutes'}"/>
                     <Label
                         Grid.Row="2"
                         Text="Ingredients:"/>
