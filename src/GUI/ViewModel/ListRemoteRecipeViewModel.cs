@@ -1,17 +1,13 @@
 using System.Collections.ObjectModel;
 using ApplicationCore.Common.Types;
-using ApplicationCore.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace GUI.ViewModel;
 
-public partial class ListLocalRecipeViewModel : ObservableObject
+public partial class ListRemoteRecipeViewModel : ObservableObject
 {
-
-    public ListLocalRecipeViewModel()
+    public ListRemoteRecipeViewModel()
     {
-
-        Text = "Test DataBinding";
         Recipes = new();
         for (int i = 0; i < 100; i++)
         {
@@ -21,6 +17,4 @@ public partial class ListLocalRecipeViewModel : ObservableObject
     
     [ObservableProperty] 
     private ObservableCollection<Recipe> _recipes;
-    
-    [ObservableProperty] private string _text;
 }

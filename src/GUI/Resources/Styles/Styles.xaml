@@ -395,8 +395,7 @@
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="Shell.NavBarIsVisible" Value="False"/>
-        <Setter Property="Shell.TabBarIsVisible" Value="False"/>
-        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Padding" Value="10"/>
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
     </Style>
     

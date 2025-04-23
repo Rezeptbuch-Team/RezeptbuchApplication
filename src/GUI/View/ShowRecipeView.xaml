@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GUI.View.ShowRecipeView"
+             xmlns:viewmodel="clr-namespace:GUI.ViewModel"
+             xmlns:types="clr-namespace:ApplicationCore.Common.Types;assembly=ApplicationCore"
+             x:DataType="viewmodel:ShowRecipeViewModel">
+    <ContentPage.Content>
+        <Grid
+            RowDefinitions="60, AUTO, *"
+            RowSpacing="10">
+            <Button
+                Grid.Row="0"
+                VerticalOptions="End"
+                Text="Publish"/>
+            <Grid
+                Grid.Row="1"
+                ColumnDefinitions="*, AUTO">
+                <Grid
+                    Grid.Column="0"
+                    RowDefinitions="40, 40, 40, *">
+                    <Label
+                        Grid.Row="0"
+                        Text="{Binding RecipeName}"/>
+                    <Label
+                        Grid.Row="1"
+                        Text="{Binding Path=RecipeTime, StringFormat='Time: {0} minutes'}"/>
+                    <Label
+                        Grid.Row="2"
+                        Text="Ingredients:"/>
+                    <ListView
+                        Grid.Row="3"
+                        ItemsSource="{Binding RecipeIngredients}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell
+                                    x:DataType="types:Ingredient">
+                                    <Grid
+                                        ColumnDefinitions="*, 40">
+                                        <Label
+                                            Grid.Column="0"
+                                            Text="{Binding Name}"/>
+                                        <Label
+                                            Grid.Column="1"
+                                            Text="{Binding Quantity}"/>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+                <Image
+                    Grid.Column="1"
+                    Source="{Binding RecipeImage}"/>
+            </Grid>
+            <Label
+                Grid.Row="2"
+                Text="{Binding RecipeDescription}"/>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
