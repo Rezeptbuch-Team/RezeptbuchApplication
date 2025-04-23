@@ -7,20 +7,23 @@ namespace GUI.ViewModel;
 
 public partial class ListLocalRecipeViewModel : ObservableObject
 {
-
-    public ListLocalRecipeViewModel()
-    {
-
-        Text = "Test DataBinding";
-        Recipes = new();
-        for (int i = 0; i < 100; i++)
-        {
-            Recipes.Add(new Recipe(i.ToString(), $"Title {i}", $"Description {i}"));
-        }
-    }
+    private readonly IOnlineRecipeListService _recipeListService;
     
     [ObservableProperty] 
-    private ObservableCollection<Recipe> _recipes;
+    private List<RecipeEntry> _recipeEntries;
     
     [ObservableProperty] private string _text;
+    
+    public ListLocalRecipeViewModel(IOnlineRecipeListService onlineRecipeListService)
+    {
+        _recipeListService = onlineRecipeListService;
+        Text = "Test DataBinding";
+        RecipeEntries = [];
+        RefreshRecipes();
+    }
+
+    private async Task RefreshRecipes()
+    {
+        RecipeEntries = await _recipeListService.GetOnlineRecipeList(new Filter(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], 10, 0));
+    }
 }
