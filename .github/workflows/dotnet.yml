@@ -22,6 +22,8 @@ jobs:
         dotnet-version: 8.0.x
     - name: Install Required Workloads
       run: dotnet workload restore --project src/ApplicationCore/ApplicationCore.csproj
+    - name: Install Required Workloads
+      run: dotnet workload restore --project src/GUI/GUI.csproj
     - name: Restore dependencies
       run: dotnet restore src/ApplicationCore
     - name: Test
