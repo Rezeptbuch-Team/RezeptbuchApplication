@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Install Required Workloads
-      run: dotnet workload restore src
+      run: dotnet workload restore src/ApplicationCore
     - name: Restore dependencies
-      run: dotnet restore src
+      run: dotnet restore src/ApplicationCore
     - name: Test
-      run: dotnet test src --no-build --verbosity normal
+      run: dotnet test src/ApplicationCore --no-build --verbosity normal
