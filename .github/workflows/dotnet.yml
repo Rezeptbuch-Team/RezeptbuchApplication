@@ -20,11 +20,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Install Required Workloads
-      run: dotnet workload restore --project src/ApplicationCore/ApplicationCore.csproj
-    - name: Install Required Workloads
-      run: dotnet workload restore --project src/GUI/GUI.csproj
     - name: Restore dependencies
-      run: dotnet restore src/ApplicationCore
-    - name: Test
-      run: dotnet test src
+      run: dotnet restore ./src/ApplicationCore.Tests/ApplicationCore.Tests.csproj
+    - name: Build ApplicationCore and Tests
+      run: dotnet build ./src/ApplicationCore.Tests/ApplicationCore.Tests.csproj --no-restore
+    - name: Run Tests
+      run: dotnet test ./src/ApplicationCore.Tests/ApplicationCore.Tests.csproj --no-build --verbosity normal
