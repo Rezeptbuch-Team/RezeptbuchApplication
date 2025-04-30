@@ -21,7 +21,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Install Required Workloads
-      run: dotnet workload restore
+      run: dotnet workload restore src
     - name: Restore dependencies
       run: dotnet restore src
     - name: Test
