@@ -23,6 +23,6 @@ jobs:
     - name: Install Required Workloads
       run: dotnet workload restore --project src/ApplicationCore/ApplicationCore.csproj
     - name: Restore dependencies
-      run: dotnet restore src/ApplicationCore
+      run: dotnet restore src
     - name: Test
-      run: dotnet test src/ApplicationCore --no-build --verbosity normal
+      run: dotnet test src
