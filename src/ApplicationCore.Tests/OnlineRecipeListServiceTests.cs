@@ -133,4 +133,6 @@ public class OnlineRecipeListServiceTests
             });
         });
     }
+
+    // will correctly responsd when encountering erros during HttpRequests
 }

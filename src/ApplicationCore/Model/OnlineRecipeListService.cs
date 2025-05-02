@@ -1,23 +1,31 @@
 ﻿using ApplicationCore.Interfaces;
 using ApplicationCore.Common.Types;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ApplicationCore.Model;
 
 // classes for json deserialization
 public class Recipe
     {
-        public required string hash { get; set; }
-        public required string title { get; set; }
-        public required string description { get; set; }
-        public required string image_path { get; set; }
-        public required List<string> categories { get; set; }
-        public int cooking_time { get; set; }
+        [JsonPropertyName("hash")]
+        public required string Hash { get; set; }
+        [JsonPropertyName("title")]
+        public required string Title { get; set; }
+        [JsonPropertyName("description")]
+        public required string Description { get; set; }
+        [JsonPropertyName("image_path")]
+        public required string ImagePath { get; set; }
+        [JsonPropertyName("categories")]
+        public required List<string> Categories { get; set; }
+        [JsonPropertyName("cooking_time")]
+        public int CookingTime { get; set; }
     }
 
 public class Root
 {
-    public required List<Recipe> recipes { get; set; }
+    [JsonPropertyName("recipes")]
+    public required List<Recipe> Recipes { get; set; }
 }
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
@@ -47,26 +55,27 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
         string url = BuildUrl(filter);
 
-        List<RecipeEntry> recipes = [];
+        List<RecipeEntry> recipesEntries = [];
         try {
             HttpResponseMessage response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode) {
                 string json = await response.Content.ReadAsStringAsync();
                 Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
-                
-                foreach (Recipe recipeEntry in extractedRoot.recipes) {
-                    recipes.Add(new RecipeEntry(recipeEntry.hash,
-                    recipeEntry.title, recipeEntry.description, recipeEntry.image_path, recipeEntry.categories,
-                    recipeEntry.cooking_time));
+
+                foreach (Recipe recipe in extractedRoot.Recipes) {
+                    recipesEntries.Add(new RecipeEntry(recipe.Hash,
+                    recipe.Title, recipe.Description, recipe.ImagePath, recipe.Categories,
+                    recipe.CookingTime));
                 }
             } else {
-                throw new Exception("Request error");
+                throw new Exception("Response error");
             }
         } catch (HttpRequestException) {
-            throw new Exception("API unrechable");
+            throw new Exception("API unreachable");
         }
         
         // download images and change the image path afterwards
-        return recipes;
+
+        return recipesEntries;
     }
 }
