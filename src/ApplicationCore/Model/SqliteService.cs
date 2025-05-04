@@ -21,8 +21,12 @@ public class SqliteService : IDatabaseService {
         _connectionString = $"Data Source={dbPath}";
     }
 
+    /// <summary>
+    /// Creates database if it does not exist
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="FileNotFoundException"></exception>
     public async Task InitializeAsync() {
-        // create database if it does not exist
         if (File.Exists(_dbPath)) return;
 
         string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Database", "Scripts", "schema.sql");
@@ -58,7 +62,7 @@ public class SqliteService : IDatabaseService {
     /// <summary>
     /// Execute SELECT asynchronously
     /// </summary>
-    /// <param name="queryText"></param>
+    /// <param name="queryText">sql command</param>
     /// <returns>DbDataReader (needs to be disposed of after use)</returns>
     public async Task<DbDataReader> QueryAsync(string queryText) {
         SqliteConnection connection = new(_connectionString);
