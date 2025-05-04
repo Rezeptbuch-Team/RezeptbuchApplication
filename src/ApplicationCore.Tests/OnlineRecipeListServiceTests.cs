@@ -6,8 +6,14 @@ using System.Net;
 
 namespace ApplicationCore.Tests;
 
+[TestFixture]
 public class OnlineRecipeListServiceTests
 {
+// warning about non-nullable fields being uninitialized is disabled,
+// because the field onlineRecipeListService is initialized in the Setup method
+// which is called before each test execution
+// and ensures it is properly initialized at runtime
+// and the field is not used before that
 #pragma warning disable CS8618
     OnlineRecipeListService onlineRecipeListService;
 #pragma warning restore CS8618
@@ -134,5 +140,5 @@ public class OnlineRecipeListServiceTests
         });
     }
 
-    // will correctly responsd when encountering erros during HttpRequests
+    // will correctly respond when encountering erros during HttpRequests
 }
