@@ -18,7 +18,7 @@ public class SqliteService : IDatabaseService {
     public SqliteService(string? dbPath = null) {
         string defaultDbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "database.sqlite");
         _dbPath = string.IsNullOrWhiteSpace(dbPath) ? defaultDbPath : dbPath;
-        _connectionString = $"Data Source={dbPath}";
+        _connectionString = $"Data Source={_dbPath}";
     }
 
     /// <summary>
@@ -50,12 +50,14 @@ public class SqliteService : IDatabaseService {
     /// </summary>
     /// <param name="commandText">sql command</param>
     /// <returns>The number of rows inserted, updated, or deleted. -1 for SELECT statements.</returns>
-    public async Task<int> NonQueryAsync(string commandText) {
+    public async Task<int> NonQueryAsync(string commandText, IDictionary<string, object>? parameters = null) {
         await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();
 
         await using SqliteCommand command = connection.CreateCommand();
         command.CommandText = commandText;
+        AddParametersToCommand(command, parameters);
+
         return await command.ExecuteNonQueryAsync();
     }
 
@@ -64,13 +66,23 @@ public class SqliteService : IDatabaseService {
     /// </summary>
     /// <param name="queryText">sql command</param>
     /// <returns>DbDataReader (needs to be disposed of after use)</returns>
-    public async Task<DbDataReader> QueryAsync(string queryText) {
+    public async Task<DbDataReader> QueryAsync(string queryText, IDictionary<string, object>? parameters = null) {
         SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();
 
         SqliteCommand command = connection.CreateCommand();
         command.CommandText = queryText;
+        AddParametersToCommand(command, parameters);
+        
         // CommandBehavior.CloseConnection: automatically close the db connection, when DbDataReader is disposed
         return await command.ExecuteReaderAsync(CommandBehavior.CloseConnection);
+    }
+
+    private static void AddParametersToCommand(SqliteCommand command, IDictionary<string, object>? parameters) {
+        if (parameters == null) return;
+
+        foreach (KeyValuePair<string, object> parameter in parameters) {
+            command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+        }
     }
 }
