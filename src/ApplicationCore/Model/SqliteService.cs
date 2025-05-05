@@ -12,6 +12,7 @@ namespace ApplicationCore.Model;
 /// </para>
 /// </summary>
 public class SqliteService : IDatabaseService {
+    private bool _isInitialized;
     private readonly string _connectionString;
     private readonly string _dbPath;
 
@@ -27,6 +28,8 @@ public class SqliteService : IDatabaseService {
     /// <returns></returns>
     /// <exception cref="FileNotFoundException"></exception>
     public async Task InitializeAsync() {
+        if (_isInitialized) return;
+
         if (File.Exists(_dbPath)) return;
 
         string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Database", "Scripts", "schema.sql");
@@ -42,8 +45,15 @@ public class SqliteService : IDatabaseService {
         await using SqliteCommand command = connection.CreateCommand();
         command.CommandText = schemaSql;
         await command.ExecuteNonQueryAsync();
+
+        _isInitialized = true;
     }
 
+    private void ThrowIfNotInitialized() {
+        if (_isInitialized) return;
+
+        throw new InvalidOperationException("Database Controller not initialized. Call InitializeAsync() first.");
+    }
 
     /// <summary>
     /// Execute INSERT/UPDATE/DELETE asynchronously
@@ -51,6 +61,8 @@ public class SqliteService : IDatabaseService {
     /// <param name="commandText">sql command</param>
     /// <returns>The number of rows inserted, updated, or deleted. -1 for SELECT statements.</returns>
     public async Task<int> NonQueryAsync(string commandText, IDictionary<string, object>? parameters = null) {
+        ThrowIfNotInitialized();
+
         await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();
 
@@ -67,6 +79,8 @@ public class SqliteService : IDatabaseService {
     /// <param name="queryText">sql command</param>
     /// <returns>DbDataReader (needs to be disposed of after use)</returns>
     public async Task<DbDataReader> QueryAsync(string queryText, IDictionary<string, object>? parameters = null) {
+        ThrowIfNotInitialized();
+        
         SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();
 
