@@ -3,13 +3,14 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class LocalRecipeListService() : ILocalRecipeListService
+public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRecipeListService
 {
 
     public async Task<List<RecipeEntry>> GetLocalRecipeList(Filter filter) {
 
         List<RecipeEntry> recipes = [];
         // get from local database using filters
+        await Task.Delay(1000); // simulate async database controller call
 
         // example data
         List<string> categories = ["category1", "category2"];

@@ -51,7 +51,7 @@ public class OnlineRecipeListServiceTests
     [Test]
     public void WillLeaveOutDefaults_WhenBuildingUrl()
     {
-        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], 10, 0);
+        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
         string url = onlineRecipeListService.BuildUrl(filter);
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
@@ -63,7 +63,7 @@ public class OnlineRecipeListServiceTests
 
     [Test]
     public void WillShowOrderAndOrderBy_WhenNotDefault() {
-        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], 10, 0);
+        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
         string url = onlineRecipeListService.BuildUrl(filter);
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
@@ -75,14 +75,14 @@ public class OnlineRecipeListServiceTests
 
     [Test]
     public void WillListCategories_WhenBuildingUrl() {
-        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], 10, 0);
+        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
         string url = onlineRecipeListService.BuildUrl(filter);
         Assert.That(url, Does.Contain("categories=category1,category2"));
     }
 
     [Test]
     public void WillStartWithQuestionMark_WhenBuildingUrl() {
-        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], 10, 0);
+        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
         string url = onlineRecipeListService.BuildUrl(filter);
         Assert.That(url, Does.StartWith("?"));
     }
@@ -111,7 +111,7 @@ public class OnlineRecipeListServiceTests
         OnlineRecipeListService service = new(mockHttpClient);
 
         // Execute
-        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], 10, 0);
+        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
         List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
 
         // Assert
