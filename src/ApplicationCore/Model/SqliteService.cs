@@ -32,6 +32,8 @@ public class SqliteService : IDatabaseService {
 
         if (File.Exists(_dbPath)) {
             // Database already exists, no need to create it again
+            // suggestion: maybe check if the file has the correct schema?
+            // if not: drop the database and create a new one
             _isInitialized = true;
             return;
         }
