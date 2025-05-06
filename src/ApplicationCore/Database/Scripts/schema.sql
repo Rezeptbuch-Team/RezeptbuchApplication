@@ -13,28 +13,24 @@ CREATE TABLE "recipes" (
 
 CREATE TABLE "categories" (
   "id" INTEGER PRIMARY KEY,
-  "name" TEXT
+  "name" TEXT,
+  FOREIGN KEY ("id") REFERENCES "recipe_category" ("category_id")
 );
 
 CREATE TABLE "recipe_category" (
   "hash" TEXT,
-  "category_id" INTEGER
+  "category_id" INTEGER,
+  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash")
 );
 
 CREATE TABLE "ingredients" (
   "id" INTEGER PRIMARY KEY,
-  "name" TEXT
+  "name" TEXT,
+  FOREIGN KEY ("id") REFERENCES "recipe_ingredient" ("ingredient_id")
 );
 
 CREATE TABLE "recipe_ingredient" (
   "hash" TEXT,
-  "ingredient_id" INTEGER
+  "ingredient_id" INTEGER,
+  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash")
 );
-
-ALTER TABLE "recipe_category" ADD FOREIGN KEY ("hash") REFERENCES "recipes" ("hash");
-
-ALTER TABLE "categories" ADD FOREIGN KEY ("id") REFERENCES "recipe_category" ("category_id");
-
-ALTER TABLE "recipe_ingredient" ADD FOREIGN KEY ("hash") REFERENCES "recipes" ("hash");
-
-ALTER TABLE "ingredients" ADD FOREIGN KEY ("id") REFERENCES "recipe_ingredient" ("ingredient_id");

@@ -30,7 +30,11 @@ public class SqliteService : IDatabaseService {
     public async Task InitializeAsync() {
         if (_isInitialized) return;
 
-        if (File.Exists(_dbPath)) return;
+        if (File.Exists(_dbPath)) {
+            // Database already exists, no need to create it again
+            _isInitialized = true;
+            return;
+        }
 
         string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Database", "Scripts", "schema.sql");
         if (!File.Exists(schemaFilePath)) {
@@ -49,6 +53,10 @@ public class SqliteService : IDatabaseService {
         _isInitialized = true;
     }
 
+    /// <summary>
+    /// Throws an exception if <see cref="InitializeAsync()"/> was not called
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
     private void ThrowIfNotInitialized() {
         if (_isInitialized) return;
 
