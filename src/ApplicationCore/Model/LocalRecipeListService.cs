@@ -67,4 +67,11 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
 
         return recipes;
     }
+
+    public async Task<List<Category>> GetCategories(CategoryOrderBy orderBy = CategoryOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
+        List<Category> categories = [];
+
+
+        return categories;
+    }
 }
