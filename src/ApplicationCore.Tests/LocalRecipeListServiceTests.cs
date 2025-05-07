@@ -41,7 +41,7 @@ public class LocalRecipeListServiceTests
                                 JOIN recipe_category rc ON r.hash = rc.recipe_hash 
                                 JOIN categories c ON rc.category_id = c.id
                                 WHERE c.name IN ($cat1)
-                                ORDER BY r.title ASC
+                                ORDER BY title ASC
                                 LIMIT $limit 
                                 OFFSET $offset";
 

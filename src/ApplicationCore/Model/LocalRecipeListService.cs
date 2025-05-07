@@ -38,8 +38,9 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
             }   
             sql += ") ";
         }
-        sql += @"ORDER BY r.title ASC
-                LIMIT $limit 
+        sql += "ORDER BY " + (filter.orderBy == OrderBy.TITLE ? "title " : "cooking_time ");
+        sql += filter.order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
                 OFFSET $offset";
         #endregion
         
@@ -71,6 +72,20 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
     public async Task<List<Category>> GetCategories(CategoryOrderBy orderBy = CategoryOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
         List<Category> categories = [];
 
+        #region create the SQL query and parameters
+        Dictionary<string, object> parameters = new() {
+            { "$limit", limit },
+            { "$offset", offset }
+        };
+        string sql = @"SELECT c.name AS name, COUNT(rc.recipe_hash) AS count
+                        FROM categories c
+                        JOIN recipe_category rc ON c.id = rc.category_id
+                        GROUP BY c.name";
+        sql += "ORDER BY " + (orderBy == CategoryOrderBy.TITLE ? "name " : "count ");
+        sql += order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
+                OFFSET $offset";
+        #endregion
 
         return categories;
     }
