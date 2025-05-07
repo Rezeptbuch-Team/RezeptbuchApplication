@@ -22,7 +22,7 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
                                 r.cooking_time AS cooking_time,
                                 c.name AS category
                         FROM recipes r 
-                        JOIN recipe_category rc ON r.hash = rc.recipe_hash 
+                        JOIN recipe_category rc ON r.hash = rc.hash 
                         JOIN categories c ON rc.category_id = c.id ";
 
         if (filter.categories.Count > 0) {
@@ -41,7 +41,7 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
         sql += "ORDER BY " + (filter.orderBy == OrderBy.TITLE ? "title " : "cooking_time ");
         sql += filter.order == Order.DESCENDING ? "DESC " : "ASC ";
         sql += @"LIMIT $limit 
-                OFFSET $offset";
+                OFFSET $offset;";
         #endregion
         
         #region execute the query and get the recipes
@@ -77,14 +77,27 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
             { "$limit", limit },
             { "$offset", offset }
         };
-        string sql = @"SELECT c.name AS name, COUNT(rc.recipe_hash) AS count
+        string sql = @"SELECT c.name AS name, COUNT(rc.hash) AS count
                         FROM categories c
                         JOIN recipe_category rc ON c.id = rc.category_id
-                        GROUP BY c.name";
+                        GROUP BY c.name ";
         sql += "ORDER BY " + (orderBy == CategoryOrderBy.TITLE ? "name " : "count ");
         sql += order == Order.DESCENDING ? "DESC " : "ASC ";
         sql += @"LIMIT $limit 
-                OFFSET $offset";
+                OFFSET $offset;";
+        #endregion
+
+        #region execute the query and get the categories#
+        //throw new Exception(sql);
+        using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
+        //throw new Exception(sql);
+        while (await resultReader.ReadAsync()) {
+            string name = resultReader.GetString(0);
+            int count = resultReader.GetInt32(1);
+
+            Category category = new(name, count);
+            categories.Add(category);
+        }
         #endregion
 
         return categories;

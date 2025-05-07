@@ -38,12 +38,12 @@ public class LocalRecipeListServiceTests
                                         r.cooking_time AS cooking_time,
                                         c.name AS category
                                 FROM recipes r 
-                                JOIN recipe_category rc ON r.hash = rc.recipe_hash 
+                                JOIN recipe_category rc ON r.hash = rc.hash 
                                 JOIN categories c ON rc.category_id = c.id
                                 WHERE c.name IN ($cat1)
                                 ORDER BY title ASC
                                 LIMIT $limit 
-                                OFFSET $offset";
+                                OFFSET $offset;";
 
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
@@ -151,13 +151,13 @@ public class LocalRecipeListServiceTests
         int limit = 10;
         int offset = 0;
 
-        string expectedSql = @"SELECT c.name AS name, COUNT(rc.recipe_hash) AS count
+        string expectedSql = @"SELECT c.name AS name, COUNT(rc.hash) AS count
                                 FROM categories c
                                 JOIN recipe_category rc ON c.id = rc.category_id
                                 GROUP BY c.name
                                 ORDER BY name ASC
                                 LIMIT $limit 
-                                OFFSET $offset";
+                                OFFSET $offset;";
 
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
@@ -197,13 +197,13 @@ public class LocalRecipeListServiceTests
         int limit = 10;
         int offset = 0;
 
-        string expectedSql = @"SELECT c.name AS name, COUNT(rc.recipe_hash) AS count
+        string expectedSql = @"SELECT c.name AS name, COUNT(rc.hash) AS count
                                 FROM categories c
                                 JOIN recipe_category rc ON c.id = rc.category_id
                                 GROUP BY c.name
                                 ORDER BY count DESC
                                 LIMIT $limit 
-                                OFFSET $offset";
+                                OFFSET $offset;";
 
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
@@ -268,10 +268,10 @@ public class LocalRecipeListServiceTests
         // check that the result is correct
         Assert.Multiple(() =>
         {
-            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result[0], Is.EqualTo(new Category("category1", 13)));
-            Assert.That(result[2], Is.EqualTo(new Category("category5", 7)));
-            Assert.That(result[1], Is.EqualTo(new Category("category2", 2)));
+            Assert.That(result[1], Is.EqualTo(new Category("category5", 7)));
+            Assert.That(result[2], Is.EqualTo(new Category("category2", 2)));
         });
     }
 }
