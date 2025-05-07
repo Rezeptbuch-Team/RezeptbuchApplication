@@ -27,7 +27,7 @@ public class LocalRecipeListServiceTests
         Filter filter = new(
             OrderBy.TITLE,
             Order.ASCENDING,
-            [],
+            ["category1"],
             [],
             10,
             0
@@ -40,7 +40,7 @@ public class LocalRecipeListServiceTests
                                 FROM recipes r 
                                 JOIN recipe_category rc ON r.hash = rc.recipe_hash 
                                 JOIN categories c ON rc.category_id = c.id
-                                WHERE c.name IN ($cat1, $cat2, $cat3)
+                                WHERE c.name IN ($cat1)
                                 ORDER BY r.title ASC
                                 LIMIT $limit 
                                 OFFSET $offset";
@@ -67,7 +67,8 @@ public class LocalRecipeListServiceTests
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
-                p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset)
+                p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
+                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0])
             )
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -124,13 +125,13 @@ public class LocalRecipeListServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0].hash, Is.EqualTo("h3"));
-            Assert.That(result[0].title, Is.EqualTo("recipe3"));
-            Assert.That(result[0].description, Is.EqualTo("description3"));
-            Assert.That(result[0].imagePath, Is.EqualTo("image_path3"));
+            Assert.That(result[0].hash, Is.EqualTo("h1"));
+            Assert.That(result[0].title, Is.EqualTo("recipe1"));
+            Assert.That(result[0].description, Is.EqualTo("description1"));
+            Assert.That(result[0].imagePath, Is.EqualTo("image_path1"));
             Assert.That(result[0].categories, Contains.Item("category1"));
             Assert.That(result[0].categories, Contains.Item("category2"));
-            Assert.That(result[0].cookingTime, Is.EqualTo(60));
+            Assert.That(result[0].cookingTime, Is.EqualTo(30));
 
             Assert.That(result[1].hash, Is.EqualTo("h2"));
             Assert.That(result[1].categories, Contains.Item("category1"));
