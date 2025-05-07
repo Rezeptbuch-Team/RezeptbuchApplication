@@ -38,19 +38,23 @@ public class SqliteService : IDatabaseService {
             return;
         }
 
+        #region Get schema
         string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Database", "Scripts", "schema.sql");
         if (!File.Exists(schemaFilePath)) {
             throw new FileNotFoundException("Schema file not found", schemaFilePath);
         }
 
         string schemaSql = await File.ReadAllTextAsync(schemaFilePath);
-
+        #endregion
+        
+        #region Create database
         await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();
 
         await using SqliteCommand command = connection.CreateCommand();
         command.CommandText = schemaSql;
         await command.ExecuteNonQueryAsync();
+        #endregion
 
         _isInitialized = true;
     }

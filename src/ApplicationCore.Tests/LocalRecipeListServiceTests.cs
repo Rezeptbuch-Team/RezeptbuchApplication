@@ -45,7 +45,7 @@ public class LocalRecipeListServiceTests
                                 LIMIT $limit 
                                 OFFSET $offset";
 
-        // create a fake DataTable to simulate the database response
+        #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("hash",  typeof(string));
         table.Columns.Add("title", typeof(string));
@@ -57,8 +57,9 @@ public class LocalRecipeListServiceTests
         table.Rows.Add("h1", "recipe1", "description1", "image_path1", 30,  "category2");
         table.Rows.Add("h1", "recipe1", "description1", "image_path1", 30, "category3");
         DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
 
-        // mock database controller
+        #region mock database controller
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
@@ -69,6 +70,7 @@ public class LocalRecipeListServiceTests
                 p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset)
             )
         )).ReturnsAsync(fakeReader).Verifiable();
+        #endregion
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
@@ -90,7 +92,7 @@ public class LocalRecipeListServiceTests
             0
         );
 
-        // create a fake DataTable to simulate the database response
+        #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("hash",  typeof(string));
         table.Columns.Add("title", typeof(string));
@@ -104,14 +106,16 @@ public class LocalRecipeListServiceTests
         table.Rows.Add("h2", "recipe2", "description2", "image_path2", 15, "category2");
         table.Rows.Add("h4", "recipe4", "description4", "image_path4", 20,  "category2");
         DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
 
-        // mock database controller
+        #region mock database controller
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             It.IsAny<string>(),
             It.IsAny<IDictionary<string, object>>()
         )).ReturnsAsync(fakeReader);
-
+        #endregion
+        
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
         List<RecipeEntry> result = await localRecipeListService.GetLocalRecipeList(filter);

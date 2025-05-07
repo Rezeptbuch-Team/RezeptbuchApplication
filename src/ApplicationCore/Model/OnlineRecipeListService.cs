@@ -56,6 +56,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         string url = BuildUrl(filter);
 
         List<RecipeEntry> recipesEntries = [];
+        #region API-Request
         try {
             HttpResponseMessage response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode) {
@@ -73,6 +74,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         } catch (HttpRequestException) {
             throw new Exception("API unreachable");
         }
+        #endregion
         
         // download images and change the image path afterwards
 

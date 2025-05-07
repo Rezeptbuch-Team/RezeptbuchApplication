@@ -18,7 +18,7 @@ public class OnlineRecipeListServiceTests
     OnlineRecipeListService onlineRecipeListService;
 #pragma warning restore CS8618
 
-    private string exampleJson = @"{
+    private readonly string exampleJson = @"{
     ""recipes"": [{
         ""hash"": ""asdafc"",
         ""title"": ""title1"",
@@ -52,7 +52,9 @@ public class OnlineRecipeListServiceTests
     public void WillLeaveOutDefaults_WhenBuildingUrl()
     {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
+
         string url = onlineRecipeListService.BuildUrl(filter);
+
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
             Assert.That(url, Does.Not.Contain("order_by=cooking_time"));
@@ -64,7 +66,9 @@ public class OnlineRecipeListServiceTests
     [Test]
     public void WillShowOrderAndOrderBy_WhenNotDefault() {
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
+
         string url = onlineRecipeListService.BuildUrl(filter);
+
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
             Assert.That(url, Does.Contain("order_by=cooking_time"));
@@ -76,20 +80,24 @@ public class OnlineRecipeListServiceTests
     [Test]
     public void WillListCategories_WhenBuildingUrl() {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
+        
         string url = onlineRecipeListService.BuildUrl(filter);
+        
         Assert.That(url, Does.Contain("categories=category1,category2"));
     }
 
     [Test]
     public void WillStartWithQuestionMark_WhenBuildingUrl() {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
+
         string url = onlineRecipeListService.BuildUrl(filter);
+        
         Assert.That(url, Does.StartWith("?"));
     }
 
     [Test]
     public async Task WillCorrectlyExtractRecipeEntriesFromJson() {
-        // Setup
+        #region Arrange
         Mock<HttpMessageHandler> mockHttpMessageHandler = new();
         mockHttpMessageHandler
         .Protected()
@@ -109,15 +117,17 @@ public class OnlineRecipeListServiceTests
             BaseAddress = new Uri("http://localhost:2222/list/")
         };
         OnlineRecipeListService service = new(mockHttpClient);
+        #endregion
 
-        // Execute
+        #region Act
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
         List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        #endregion
 
-        // Assert
+        #region Assert
         Assert.Multiple(() => {
             Assert.That(result, Has.Count.EqualTo(2));
-            // first recipe entry
+            #region first recipe entry
             Assert.Multiple(() => {
                 Assert.That(result[0].hash, Is.EqualTo("asdafc"));
                 Assert.That(result[0].title, Is.EqualTo("title1"));
@@ -127,7 +137,8 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[0].categories, Does.Contain("category1"));
                 Assert.That(result[0].categories, Does.Contain("category2"));
             });
-            // second recipe entry
+            #endregion
+            #region second recipe entry
             Assert.Multiple(() => {
                 Assert.That(result[1].hash, Is.EqualTo("agdgd"));
                 Assert.That(result[1].title, Is.EqualTo("title2"));
@@ -137,8 +148,8 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[1].categories, Does.Contain("category1"));
                 Assert.That(result[1].categories, Does.Contain("category2"));
             });
+            #endregion
         });
+        #endregion
     }
-
-    // will correctly respond when encountering erros during HttpRequests
 }
