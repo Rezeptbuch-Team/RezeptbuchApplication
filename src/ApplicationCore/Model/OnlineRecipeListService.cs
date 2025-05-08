@@ -69,7 +69,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
                     recipe.CookingTime));
                 }
             } else {
-                throw new Exception("Response error");
+                throw new Exception("Response error. Status code: " + response.StatusCode);
             }
         } catch (HttpRequestException) {
             throw new Exception("API unreachable");

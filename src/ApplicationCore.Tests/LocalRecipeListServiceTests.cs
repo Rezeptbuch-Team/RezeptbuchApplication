@@ -54,6 +54,63 @@ public class LocalRecipeListServiceTests
         table.Columns.Add("cooking_time", typeof(int));
         table.Columns.Add("category", typeof(string));
         table.Rows.Add("h1", "recipe1", "description1", "image_path1", 30, "category1");
+        DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
+
+        #region mock database controller
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.QueryAsync(
+            // check that the SQL query is correct
+            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            // check that the parameters are correct
+            It.Is<IDictionary<string, object>>(p =>
+                p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
+                p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
+                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0])
+            )
+        )).ReturnsAsync(fakeReader).Verifiable();
+        #endregion
+
+        // create the service and call the method
+        LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
+        List<RecipeEntry> result = await localRecipeListService.GetLocalRecipeList(filter);
+
+        // check that the queryAsync method was called
+        mockDatabaseService.Verify();
+    }
+
+    [Test]
+    public async Task GetLocalRecipes_ShouldCorrectlyCreateSqlAndParameters_DifferentFilter()
+    {
+        Filter filter = new(
+            OrderBy.COOKINGTIME,
+            Order.DESCENDING,
+            ["category2", "category3"],
+            [],
+            5,
+            10
+        );
+        string expectedSql = @"SELECT r.hash AS hash, r.title AS title, 
+                                        r.description AS description, 
+                                        r.image_path AS image_path,
+                                        r.cooking_time AS cooking_time,
+                                        c.name AS category
+                                FROM recipes r 
+                                JOIN recipe_category rc ON r.hash = rc.hash 
+                                JOIN categories c ON rc.category_id = c.id
+                                WHERE c.name IN ($cat1, $cat2)
+                                ORDER BY cooking_time DESC
+                                LIMIT $limit 
+                                OFFSET $offset;";
+
+        #region create a fake DataTable to simulate the database response
+        DataTable table = new();
+        table.Columns.Add("hash",  typeof(string));
+        table.Columns.Add("title", typeof(string));
+        table.Columns.Add("description", typeof(string));
+        table.Columns.Add("image_path", typeof(string));
+        table.Columns.Add("cooking_time", typeof(int));
+        table.Columns.Add("category", typeof(string));
         table.Rows.Add("h1", "recipe1", "description1", "image_path1", 30,  "category2");
         table.Rows.Add("h1", "recipe1", "description1", "image_path1", 30, "category3");
         DbDataReader fakeReader = table.CreateDataReader();
@@ -68,7 +125,8 @@ public class LocalRecipeListServiceTests
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
                 p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
-                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0])
+                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0]) &&
+                p.ContainsKey("$cat2") && p["$cat2"].Equals(filter.categories[1])
             )
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion

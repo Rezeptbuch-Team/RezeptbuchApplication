@@ -152,4 +152,14 @@ public class OnlineRecipeListServiceTests
         });
         #endregion
     }
+
+    [Test]
+    public async Task WillDownloadImageAndChangeThePath() {
+        // create a mock that returns a url to an image (like exampleJson but with a different image path)
+
+        // create a mock that returns the image (at the given url)
+
+
+        // check that the image is downloaded and the path is changed
+    }
 }
