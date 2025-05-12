@@ -23,7 +23,7 @@ public class OnlineRecipeListServiceTests
         ""hash"": ""asdafc"",
         ""title"": ""title1"",
         ""description"": ""description1"",
-        ""image_path"": ""imagePath1"",
+        ""image_path"": ""https://api.server.com/images/asdafc"",
         ""categories"": [""category1"", ""category2""],
         ""cooking_time"": 15
     },
@@ -31,19 +31,18 @@ public class OnlineRecipeListServiceTests
         ""hash"": ""agdgd"",
         ""title"": ""title2"",
         ""description"": ""description2"",
-        ""image_path"": ""imagePath2"",
+        ""image_path"": ""https://api.server.com/images/agdgd"",
         ""categories"": [""category1"", ""category2""],
         ""cooking_time"": 30
     }]
     }";
-
 
     [SetUp]
     public void Setup()
     {
         HttpClient httpClient = new()
         {
-            BaseAddress = new Uri("http://localhost:2222/list/")
+            BaseAddress = new Uri("http://api.server.com/list/")
         };
         onlineRecipeListService = new(httpClient);
     }
@@ -114,7 +113,7 @@ public class OnlineRecipeListServiceTests
         
         HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
         {
-            BaseAddress = new Uri("http://localhost:2222/list/")
+            BaseAddress = new Uri("http://api.server.com/list/")
         };
         OnlineRecipeListService service = new(mockHttpClient);
         #endregion
@@ -132,7 +131,7 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[0].hash, Is.EqualTo("asdafc"));
                 Assert.That(result[0].title, Is.EqualTo("title1"));
                 Assert.That(result[0].description, Is.EqualTo("description1"));
-                Assert.That(result[0].imagePath, Is.EqualTo("imagePath1"));
+                Assert.That(result[0].imagePath, Is.EqualTo("https://api.server.com/images/asdafc"));
                 Assert.That(result[0].cookingTime, Is.EqualTo(15));
                 Assert.That(result[0].categories, Does.Contain("category1"));
                 Assert.That(result[0].categories, Does.Contain("category2"));
@@ -143,7 +142,7 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[1].hash, Is.EqualTo("agdgd"));
                 Assert.That(result[1].title, Is.EqualTo("title2"));
                 Assert.That(result[1].description, Is.EqualTo("description2"));
-                Assert.That(result[1].imagePath, Is.EqualTo("imagePath2"));
+                Assert.That(result[1].imagePath, Is.EqualTo("https://api.server.com/images/agdgd"));
                 Assert.That(result[1].cookingTime, Is.EqualTo(30));
                 Assert.That(result[1].categories, Does.Contain("category1"));
                 Assert.That(result[1].categories, Does.Contain("category2"));
@@ -154,24 +153,56 @@ public class OnlineRecipeListServiceTests
     }
 
     [Test]
-    public async Task WillTryToDownloadImage() {
-        // create a mock that returns a url to an image (like exampleJson but with a different image path)
+    public async Task WillTryToDownloadImages() {
+        #region Arrange
+        #region create a mock that also returns a url to an image
+        Mock<HttpMessageHandler> mockHttpMessageHandler = new();
+        mockHttpMessageHandler
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .ReturnsAsync(new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(exampleJson)
+        });
+        #endregion
+
+        #region initialize the service
+        HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/list/")
+        };
+        OnlineRecipeListService service = new(mockHttpClient);
+        #endregion
+        #endregion
 
         // check that the imageurl is "accessed"
+
+        #region Assert
+        Assert.Fail("Not yet implemented");
+        #endregion
     }
 
     [Test]
-    public async Task WillCorrectlyDownloadImage() {
+    public async Task WillCorrectlyDownloadImages() {
         // create a mock that returns a url to an image (like exampleJson but with a different image path)
 
         // check that the image is downloaded
+
+        Assert.Fail("Not yet implemented");
     }
 
     [Test]
-    public async Task WillCorrectlyChangePathOfImage() {
+    public async Task WillCorrectlyChangePathOfImages() {
         // create a mock that returns a url to an image (like exampleJson but with a different image path)
 
         // check that the image is downloaded and the path is changed
+
+        Assert.Fail("Not yet implemented");
     }
 
 }
