@@ -14,8 +14,6 @@ public class Recipe
         public required string Title { get; set; }
         [JsonPropertyName("description")]
         public required string Description { get; set; }
-        [JsonPropertyName("image_path")]
-        public required string ImagePath { get; set; }
         [JsonPropertyName("categories")]
         public required List<string> Categories { get; set; }
         [JsonPropertyName("cooking_time")]
@@ -30,8 +28,8 @@ public class Root
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
 {
-    public string BuildUrl(Filter filter) {
-        string url = "?";
+    public string BuildListUrl(Filter filter) {
+        string url = "/list?";
         url += "count=" + filter.count.ToString() + "&";
         url += "offset=" + filter.offset.ToString();
         if (filter.orderBy == OrderBy.COOKINGTIME) {
@@ -53,28 +51,48 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     }
 
     public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
-        string url = BuildUrl(filter);
+        string listUrl = BuildListUrl(filter);
 
         List<RecipeEntry> recipesEntries = [];
+        #region API-Request
         try {
-            HttpResponseMessage response = await httpClient.GetAsync(url);
+            HttpResponseMessage response = await httpClient.GetAsync(listUrl);
             if (response.IsSuccessStatusCode) {
                 string json = await response.Content.ReadAsStringAsync();
                 Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
 
                 foreach (Recipe recipe in extractedRoot.Recipes) {
+                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), recipe.Hash + ".png");
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
-                    recipe.Title, recipe.Description, recipe.ImagePath, recipe.Categories,
+                    recipe.Title, recipe.Description, imagePath, recipe.Categories,
                     recipe.CookingTime));
                 }
             } else {
-                throw new Exception("Response error");
+                throw new Exception("Response error. Status code: " + response.StatusCode);
             }
         } catch (HttpRequestException) {
             throw new Exception("API unreachable");
         }
+        #endregion
         
-        // download images and change the image path afterwards
+        #region download images
+        if (recipesEntries.Count > 0) {
+            foreach(RecipeEntry recipeEntry in recipesEntries) {
+                string imageUrl = "/images/" + recipeEntry.hash + ".png";
+                try {
+                    HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
+                    if (response.IsSuccessStatusCode) {
+                        using FileStream fileStream = new(recipeEntry.imagePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                        await response.Content.CopyToAsync(fileStream);
+                    } else {
+                        throw new Exception("Image download error. Status code: " + response.StatusCode);
+                    }
+                } catch (HttpRequestException) {
+                    throw new Exception("API unreachable");
+                }
+            }
+        }
+        #endregion
 
         return recipesEntries;
     }

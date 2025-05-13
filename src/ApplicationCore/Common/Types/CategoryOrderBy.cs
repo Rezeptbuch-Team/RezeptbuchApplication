@@ -1,6 +1,6 @@
 namespace ApplicationCore.Common.Types;
 
-public enum OrderBy {
+public enum CategoryOrderBy {
     TITLE,
-    COOKINGTIME
+    COUNT
 }
