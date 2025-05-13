@@ -3,6 +3,7 @@ using ApplicationCore.Model;
 using Moq;
 using Moq.Protected;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace ApplicationCore.Tests;
 
@@ -17,6 +18,7 @@ public class OnlineRecipeListServiceTests
 #pragma warning disable CS8618
     OnlineRecipeListService onlineRecipeListService;
 #pragma warning restore CS8618
+    readonly byte[] pngBytes = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Ressources", "test.png"));
 
     private readonly string exampleJson = @"{
     ""recipes"": [{
@@ -151,7 +153,7 @@ public class OnlineRecipeListServiceTests
     [Test]
     public async Task WillTryToDownloadImages() {
         #region Arrange
-        #region create a mock that also returns a url to an image
+        #region create a mock that also contains a route where an image is returned
         Mock<HttpMessageHandler> mockHttpMessageHandler = new();
         mockHttpMessageHandler
         .Protected()
@@ -160,10 +162,27 @@ public class OnlineRecipeListServiceTests
             ItExpr.IsAny<HttpRequestMessage>(),
             ItExpr.IsAny<CancellationToken>()
         )
-        .ReturnsAsync(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(exampleJson)
+        .ReturnsAsync((HttpRequestMessage request, CancellationToken _) => {
+            #region image response
+            string path = request.RequestUri?.AbsolutePath ?? "";
+            if (path.StartsWith("/images/", StringComparison.OrdinalIgnoreCase))
+            {
+                ByteArrayContent imageContent = new(pngBytes);
+                imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = imageContent
+                };
+            }
+            #endregion
+            #region default data response
+            return new HttpResponseMessage{
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(exampleJson)
+            };
+            #endregion
         });
         #endregion
 
@@ -176,29 +195,163 @@ public class OnlineRecipeListServiceTests
         #endregion
         #endregion
 
-        // check that the imageurl is "accessed"
+        #region Act
+        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
+        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        #endregion
 
-        #region Assert
-        Assert.Fail("Not yet implemented");
+
+        #region Assert that the "/images/{hash}" route is called
+        mockHttpMessageHandler.Protected().Verify(
+            "SendAsync",
+            Times.AtLeastOnce(),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri != null &&
+                req.RequestUri.AbsolutePath.StartsWith("/images/")
+            ),
+            ItExpr.IsAny<CancellationToken>()
+        );
         #endregion
     }
 
     [Test]
     public async Task WillCorrectlyDownloadImages() {
-        // create a mock that returns a url to an image (like exampleJson but with a different image path)
+        #region Arrange
+        #region create image paths and delete them if they exist
+        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string[] expectedFilePaths = [
+            Path.Combine(appDataPath, "asdafc.png"),
+            Path.Combine(appDataPath, "agdgd.png")
+        ];
+        foreach (string path in expectedFilePaths)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        #endregion
 
-        // check that the image is downloaded
+        #region create a mock that also contains a route where an image is returned
+        Mock<HttpMessageHandler> mockHttpMessageHandler = new();
+        mockHttpMessageHandler
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .ReturnsAsync((HttpRequestMessage request, CancellationToken _) => {
+            #region image response
+            string path = request.RequestUri?.AbsolutePath ?? "";
+            if (path.StartsWith("/images/", StringComparison.OrdinalIgnoreCase))
+            {
+                ByteArrayContent imageContent = new(pngBytes);
+                imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
 
-        Assert.Fail("Not yet implemented");
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = imageContent
+                };
+            }
+            #endregion
+            #region default data response
+            return new HttpResponseMessage{
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(exampleJson)
+            };
+            #endregion
+        });
+        #endregion
+
+        #region initialize the service
+        HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/")
+        };
+        OnlineRecipeListService service = new(mockHttpClient);
+        #endregion
+        #endregion
+
+        #region Act
+        Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
+        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        #endregion
+
+        #region Assert that the image is downloaded
+        Assert.Multiple(() => {
+            foreach (string path in expectedFilePaths)
+            {
+                Assert.That(File.Exists(path), Is.True);
+            }
+        });
+        #endregion
     }
 
     [Test]
     public async Task WillCorrectlyChangePathOfImages() {
-        // create a mock that returns a url to an image (like exampleJson but with a different image path)
+        #region Arrange
+        #region create image paths
+        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string[] expectedFilePaths = [
+            Path.Combine(appDataPath, "asdafc.png"),
+            Path.Combine(appDataPath, "agdgd.png")
+        ];
+        #endregion
 
-        // check that the image is downloaded and the path is changed
+        #region create a mock that also contains a route where an image is returned
+        Mock<HttpMessageHandler> mockHttpMessageHandler = new();
+        mockHttpMessageHandler
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .ReturnsAsync((HttpRequestMessage request, CancellationToken _) => {
+            #region image response
+            string path = request.RequestUri?.AbsolutePath ?? "";
+            if (path.StartsWith("/images/", StringComparison.OrdinalIgnoreCase))
+            {
+                ByteArrayContent imageContent = new(pngBytes);
+                imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
 
-        Assert.Fail("Not yet implemented");
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = imageContent
+                };
+            }
+            #endregion
+            #region default data response
+            return new HttpResponseMessage{
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(exampleJson)
+            };
+            #endregion
+        });
+        #endregion
+
+        #region initialize the service
+        HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/")
+        };
+        OnlineRecipeListService service = new(mockHttpClient);
+        #endregion
+        #endregion
+
+        #region Act
+        Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
+        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        #endregion
+
+        #region Assert that the image is downloaded
+        Assert.Multiple(() => {
+            Assert.That(result[0].imagePath, Is.EqualTo(expectedFilePaths[0]));
+            Assert.That(result[1].imagePath, Is.EqualTo(expectedFilePaths[1]));
+        });
+        #endregion
     }
-
 }

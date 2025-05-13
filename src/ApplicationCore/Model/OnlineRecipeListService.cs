@@ -62,8 +62,9 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
                 Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
 
                 foreach (Recipe recipe in extractedRoot.Recipes) {
+                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), recipe.Hash + ".png");
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
-                    recipe.Title, recipe.Description, string.Empty, recipe.Categories,
+                    recipe.Title, recipe.Description, imagePath, recipe.Categories,
                     recipe.CookingTime));
                 }
             } else {
@@ -74,7 +75,24 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         }
         #endregion
         
-        // download images and change the image path afterwards
+        #region download images
+        if (recipesEntries.Count > 0) {
+            foreach(RecipeEntry recipeEntry in recipesEntries) {
+                string imageUrl = "/images/" + recipeEntry.hash + ".png";
+                try {
+                    HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
+                    if (response.IsSuccessStatusCode) {
+                        using FileStream fileStream = new(recipeEntry.imagePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                        await response.Content.CopyToAsync(fileStream);
+                    } else {
+                        throw new Exception("Image download error. Status code: " + response.StatusCode);
+                    }
+                } catch (HttpRequestException) {
+                    throw new Exception("API unreachable");
+                }
+            }
+        }
+        #endregion
 
         return recipesEntries;
     }
