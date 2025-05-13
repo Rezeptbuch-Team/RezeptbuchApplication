@@ -23,7 +23,6 @@ public class OnlineRecipeListServiceTests
         ""hash"": ""asdafc"",
         ""title"": ""title1"",
         ""description"": ""description1"",
-        ""image_path"": ""https://api.server.com/images/asdafc"",
         ""categories"": [""category1"", ""category2""],
         ""cooking_time"": 15
     },
@@ -31,7 +30,6 @@ public class OnlineRecipeListServiceTests
         ""hash"": ""agdgd"",
         ""title"": ""title2"",
         ""description"": ""description2"",
-        ""image_path"": ""https://api.server.com/images/agdgd"",
         ""categories"": [""category1"", ""category2""],
         ""cooking_time"": 30
     }]
@@ -42,7 +40,7 @@ public class OnlineRecipeListServiceTests
     {
         HttpClient httpClient = new()
         {
-            BaseAddress = new Uri("http://api.server.com/list/")
+            BaseAddress = new Uri("http://api.server.com/")
         };
         onlineRecipeListService = new(httpClient);
     }
@@ -52,7 +50,7 @@ public class OnlineRecipeListServiceTests
     {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
 
-        string url = onlineRecipeListService.BuildUrl(filter);
+        string url = onlineRecipeListService.BuildListUrl(filter);
 
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
@@ -66,7 +64,7 @@ public class OnlineRecipeListServiceTests
     public void WillShowOrderAndOrderBy_WhenNotDefault() {
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
 
-        string url = onlineRecipeListService.BuildUrl(filter);
+        string url = onlineRecipeListService.BuildListUrl(filter);
 
         Assert.Multiple(() => {
             Assert.That(url, Does.Not.Contain("order_by=title"));
@@ -80,18 +78,18 @@ public class OnlineRecipeListServiceTests
     public void WillListCategories_WhenBuildingUrl() {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
         
-        string url = onlineRecipeListService.BuildUrl(filter);
+        string url = onlineRecipeListService.BuildListUrl(filter);
         
         Assert.That(url, Does.Contain("categories=category1,category2"));
     }
 
     [Test]
-    public void WillStartWithQuestionMark_WhenBuildingUrl() {
+    public void WillStartCorrectly_WhenBuildingUrl() {
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
 
-        string url = onlineRecipeListService.BuildUrl(filter);
+        string url = onlineRecipeListService.BuildListUrl(filter);
         
-        Assert.That(url, Does.StartWith("?"));
+        Assert.That(url, Does.StartWith("/list?"));
     }
 
     [Test]
@@ -113,7 +111,7 @@ public class OnlineRecipeListServiceTests
         
         HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
         {
-            BaseAddress = new Uri("http://api.server.com/list/")
+            BaseAddress = new Uri("http://api.server.com/")
         };
         OnlineRecipeListService service = new(mockHttpClient);
         #endregion
@@ -131,7 +129,6 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[0].hash, Is.EqualTo("asdafc"));
                 Assert.That(result[0].title, Is.EqualTo("title1"));
                 Assert.That(result[0].description, Is.EqualTo("description1"));
-                Assert.That(result[0].imagePath, Is.EqualTo("https://api.server.com/images/asdafc"));
                 Assert.That(result[0].cookingTime, Is.EqualTo(15));
                 Assert.That(result[0].categories, Does.Contain("category1"));
                 Assert.That(result[0].categories, Does.Contain("category2"));
@@ -142,7 +139,6 @@ public class OnlineRecipeListServiceTests
                 Assert.That(result[1].hash, Is.EqualTo("agdgd"));
                 Assert.That(result[1].title, Is.EqualTo("title2"));
                 Assert.That(result[1].description, Is.EqualTo("description2"));
-                Assert.That(result[1].imagePath, Is.EqualTo("https://api.server.com/images/agdgd"));
                 Assert.That(result[1].cookingTime, Is.EqualTo(30));
                 Assert.That(result[1].categories, Does.Contain("category1"));
                 Assert.That(result[1].categories, Does.Contain("category2"));
@@ -174,7 +170,7 @@ public class OnlineRecipeListServiceTests
         #region initialize the service
         HttpClient mockHttpClient = new(mockHttpMessageHandler.Object)
         {
-            BaseAddress = new Uri("https://api.server.com/list/")
+            BaseAddress = new Uri("https://api.server.com/")
         };
         OnlineRecipeListService service = new(mockHttpClient);
         #endregion

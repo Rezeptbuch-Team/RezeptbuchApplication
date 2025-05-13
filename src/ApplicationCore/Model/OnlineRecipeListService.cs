@@ -14,8 +14,6 @@ public class Recipe
         public required string Title { get; set; }
         [JsonPropertyName("description")]
         public required string Description { get; set; }
-        [JsonPropertyName("image_path")]
-        public required string ImagePath { get; set; }
         [JsonPropertyName("categories")]
         public required List<string> Categories { get; set; }
         [JsonPropertyName("cooking_time")]
@@ -30,8 +28,8 @@ public class Root
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
 {
-    public string BuildUrl(Filter filter) {
-        string url = "?";
+    public string BuildListUrl(Filter filter) {
+        string url = "/list?";
         url += "count=" + filter.count.ToString() + "&";
         url += "offset=" + filter.offset.ToString();
         if (filter.orderBy == OrderBy.COOKINGTIME) {
@@ -53,19 +51,19 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     }
 
     public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
-        string url = BuildUrl(filter);
+        string listUrl = BuildListUrl(filter);
 
         List<RecipeEntry> recipesEntries = [];
         #region API-Request
         try {
-            HttpResponseMessage response = await httpClient.GetAsync(url);
+            HttpResponseMessage response = await httpClient.GetAsync(listUrl);
             if (response.IsSuccessStatusCode) {
                 string json = await response.Content.ReadAsStringAsync();
                 Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
 
                 foreach (Recipe recipe in extractedRoot.Recipes) {
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
-                    recipe.Title, recipe.Description, recipe.ImagePath, recipe.Categories,
+                    recipe.Title, recipe.Description, string.Empty, recipe.Categories,
                     recipe.CookingTime));
                 }
             } else {
