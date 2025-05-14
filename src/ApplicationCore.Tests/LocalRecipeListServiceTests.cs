@@ -32,7 +32,7 @@ public class LocalRecipeListServiceTests
             10,
             0
         );
-        string expectedSql = @"SELECT r.hash AS hash, r.title AS title, 
+        string expectedSql = @"SELECT DISTINCT r.hash AS hash, r.title AS title, 
                                         r.description AS description, 
                                         r.image_path AS image_path,
                                         r.cooking_time AS cooking_time,
@@ -86,11 +86,11 @@ public class LocalRecipeListServiceTests
             OrderBy.COOKINGTIME,
             Order.DESCENDING,
             ["category2", "category3"],
-            [],
+            ["tomato", "cheese"],
             5,
             10
         );
-        string expectedSql = @"SELECT r.hash AS hash, r.title AS title, 
+        string expectedSql = @"SELECT DISTINCT r.hash AS hash, r.title AS title, 
                                         r.description AS description, 
                                         r.image_path AS image_path,
                                         r.cooking_time AS cooking_time,
@@ -98,7 +98,10 @@ public class LocalRecipeListServiceTests
                                 FROM recipes r 
                                 JOIN recipe_category rc ON r.hash = rc.hash 
                                 JOIN categories c ON rc.category_id = c.id
-                                WHERE c.name IN ($cat1, $cat2)
+                                JOIN recipe_ingredient ri ON r.hash = ri.hash
+                                JOIN ingredients i ON ri.ingredient_id = i.id
+                                WHERE c.name IN ($cat1, $cat2) 
+                                    AND i.name IN ($ing1, $ing2)
                                 ORDER BY cooking_time DESC
                                 LIMIT $limit 
                                 OFFSET $offset;";
@@ -126,7 +129,9 @@ public class LocalRecipeListServiceTests
                 p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
                 p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
                 p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0]) &&
-                p.ContainsKey("$cat2") && p["$cat2"].Equals(filter.categories[1])
+                p.ContainsKey("$cat2") && p["$cat2"].Equals(filter.categories[1]) &&
+                p.ContainsKey("$ing1") && p["$ing1"].Equals(filter.availableIngredients[0]) &&
+                p.ContainsKey("$ing2") && p["$ing2"].Equals(filter.availableIngredients[1])
             )
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -146,7 +151,7 @@ public class LocalRecipeListServiceTests
             OrderBy.TITLE,
             Order.ASCENDING,
             ["category1", "category2"],
-            [],
+            ["tomato"],
             10,
             0
         );
