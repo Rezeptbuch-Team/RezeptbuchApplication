@@ -91,8 +91,8 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
         return recipes;
     }
 
-    public async Task<List<Category>> GetCategories(CategoryOrderBy orderBy = CategoryOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
-        List<Category> categories = [];
+    public async Task<List<FilterOption>> GetCategories(FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
+        List<FilterOption> categories = [];
 
         #region create the SQL query and parameters
         Dictionary<string, object> parameters = new() {
@@ -103,25 +103,57 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
                         FROM categories c
                         JOIN recipe_category rc ON c.id = rc.category_id
                         GROUP BY c.name ";
-        sql += "ORDER BY " + (orderBy == CategoryOrderBy.TITLE ? "name " : "count ");
+        sql += "ORDER BY " + (orderBy == FilterOptionOrderBy.TITLE ? "name " : "count ");
         sql += order == Order.DESCENDING ? "DESC " : "ASC ";
         sql += @"LIMIT $limit 
                 OFFSET $offset;";
         #endregion
 
-        #region execute the query and get the categories#
-        //throw new Exception(sql);
+        #region execute the query and get the categories
         using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
-        //throw new Exception(sql);
+        
         while (await resultReader.ReadAsync()) {
             string name = resultReader.GetString(0);
             int count = resultReader.GetInt32(1);
 
-            Category category = new(name, count);
+            FilterOption category = new(name, count);
             categories.Add(category);
         }
         #endregion
 
         return categories;
+    }
+
+    public async Task<List<FilterOption>> GetIngredients(FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
+        List<FilterOption> ingredients = [];
+
+        #region create the SQL query and parameters
+        Dictionary<string, object> parameters = new() {
+            { "$limit", limit },
+            { "$offset", offset }
+        };
+        string sql = @"SELECT i.name AS name, COUNT(ri.hash) AS count
+                        FROM ingredients i
+                        JOIN recipe_ingredient ri ON i.id = ri.ingredient_id
+                        GROUP BY i.name ";
+        sql += "ORDER BY " + (orderBy == FilterOptionOrderBy.TITLE ? "name " : "count ");
+        sql += order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
+                OFFSET $offset;";
+        #endregion
+
+        #region execute the query and get the categories
+        using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
+        
+        while (await resultReader.ReadAsync()) {
+            string name = resultReader.GetString(0);
+            int count = resultReader.GetInt32(1);
+
+            FilterOption ingredient = new(name, count);
+            ingredients.Add(ingredient);
+        }
+        #endregion
+
+        return ingredients;
     }
 }

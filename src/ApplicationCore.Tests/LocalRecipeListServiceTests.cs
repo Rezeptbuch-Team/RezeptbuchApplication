@@ -209,7 +209,7 @@ public class LocalRecipeListServiceTests
     [Test]
     public async Task GetCategories_ShouldCorrectlyCreateSqlAndParametersWhenOrderingByTitle()
     {
-        CategoryOrderBy orderBy = CategoryOrderBy.TITLE;
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE;
         Order order = Order.ASCENDING;
         int limit = 10;
         int offset = 0;
@@ -246,7 +246,7 @@ public class LocalRecipeListServiceTests
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<Category> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
+        List<FilterOption> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
 
         // check that the queryAsync method was called
         mockDatabaseService.Verify();
@@ -255,7 +255,7 @@ public class LocalRecipeListServiceTests
     [Test]
     public async Task GetCategories_ShouldCorrectlyCreateSqlAndParameters()
     {
-        CategoryOrderBy orderBy = CategoryOrderBy.COUNT;
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.COUNT;
         Order order = Order.DESCENDING;
         int limit = 10;
         int offset = 0;
@@ -292,7 +292,7 @@ public class LocalRecipeListServiceTests
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<Category> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
+        List<FilterOption> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
 
         // check that the queryAsync method was called
         mockDatabaseService.Verify();
@@ -301,7 +301,7 @@ public class LocalRecipeListServiceTests
     [Test]
     public async Task GetCategories_ShouldReturnCorrectData()
     {
-        CategoryOrderBy orderBy = CategoryOrderBy.COUNT;
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.COUNT;
         Order order = Order.DESCENDING;
         int limit = 10;
         int offset = 0;
@@ -326,15 +326,148 @@ public class LocalRecipeListServiceTests
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<Category> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
+        List<FilterOption> result = await localRecipeListService.GetCategories(orderBy, order, limit, offset);
 
         // check that the result is correct
         Assert.Multiple(() =>
         {
             Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0], Is.EqualTo(new Category("category1", 13)));
-            Assert.That(result[1], Is.EqualTo(new Category("category5", 7)));
-            Assert.That(result[2], Is.EqualTo(new Category("category2", 2)));
+            Assert.That(result[0], Is.EqualTo(new FilterOption("category1", 13)));
+            Assert.That(result[1], Is.EqualTo(new FilterOption("category5", 7)));
+            Assert.That(result[2], Is.EqualTo(new FilterOption("category2", 2)));
         });
     }
+
+    [Test]
+    public async Task GetIngredients_ShouldCorrectlyCreateSqlAndParametersWhenOrderingByTitle()
+    {
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE;
+        Order order = Order.ASCENDING;
+        int limit = 10;
+        int offset = 0;
+
+        string expectedSql = @"SELECT i.name AS name, COUNT(ri.hash) AS count
+                                FROM ingredients i
+                                JOIN recipe_ingredient ri ON i.id = ri.ingredient_id
+                                GROUP BY i.name
+                                ORDER BY name ASC
+                                LIMIT $limit 
+                                OFFSET $offset;";
+
+        #region create a fake DataTable to simulate the database response
+        DataTable table = new();
+        table.Columns.Add("name", typeof(string));
+        table.Columns.Add("count", typeof(int));
+        table.Rows.Add("tomato", 5);
+        table.Rows.Add("cheese", 3);
+        DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
+
+        #region mock database controller
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.QueryAsync(
+            // check that the SQL query is correct
+            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            // check that the parameters are correct
+            It.Is<IDictionary<string, object>>(p =>
+                p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
+                p.ContainsKey("$offset") && p["$offset"].Equals(offset)
+            )
+        )).ReturnsAsync(fakeReader).Verifiable();
+        #endregion
+
+        // create the service and call the method
+        LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
+        List<FilterOption> result = await localRecipeListService.GetIngredients(orderBy, order, limit, offset);
+
+        // check that the queryAsync method was called
+        mockDatabaseService.Verify();
+    }
+
+    [Test]
+    public async Task GetIngredients_ShouldCorrectlyCreateSqlAndParameters()
+    {
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.COUNT;
+        Order order = Order.DESCENDING;
+        int limit = 10;
+        int offset = 0;
+
+        string expectedSql = @"SELECT i.name AS name, COUNT(ri.hash) AS count
+                                FROM ingredients i
+                                JOIN recipe_ingredient ri ON i.id = ri.ingredient_id
+                                GROUP BY i.name
+                                ORDER BY count DESC
+                                LIMIT $limit 
+                                OFFSET $offset;";
+
+        #region create a fake DataTable to simulate the database response
+        DataTable table = new();
+        table.Columns.Add("name", typeof(string));
+        table.Columns.Add("count", typeof(int));
+        table.Rows.Add("tomato", 5);
+        table.Rows.Add("cheese", 3);
+        DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
+
+        #region mock database controller
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.QueryAsync(
+            // check that the SQL query is correct
+            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            // check that the parameters are correct
+            It.Is<IDictionary<string, object>>(p =>
+                p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
+                p.ContainsKey("$offset") && p["$offset"].Equals(offset)
+            )
+        )).ReturnsAsync(fakeReader).Verifiable();
+        #endregion
+
+        // create the service and call the method
+        LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
+        List<FilterOption> result = await localRecipeListService.GetIngredients(orderBy, order, limit, offset);
+
+        // check that the queryAsync method was called
+        mockDatabaseService.Verify();
+    }
+
+    [Test]
+    public async Task GetIngredients_ShouldReturnCorrectData()
+    {
+        FilterOptionOrderBy orderBy = FilterOptionOrderBy.COUNT;
+        Order order = Order.DESCENDING;
+        int limit = 10;
+        int offset = 0;
+
+        #region create a fake DataTable to simulate the database response
+        DataTable table = new();
+        table.Columns.Add("name", typeof(string));
+        table.Columns.Add("count", typeof(int));
+        table.Rows.Add("tomato", 13);
+        table.Rows.Add("cheese", 7);
+        table.Rows.Add("flour", 2);
+        DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
+
+        #region mock database controller
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.QueryAsync(
+            It.IsAny<string>(),
+            It.IsAny<IDictionary<string, object>>()
+        )).ReturnsAsync(fakeReader);
+        #endregion
+
+        // create the service and call the method
+        LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
+        List<FilterOption> result = await localRecipeListService.GetIngredients(orderBy, order, limit, offset);
+
+        // check that the result is correct
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(3));
+            Assert.That(result[0], Is.EqualTo(new FilterOption("tomato", 13)));
+            Assert.That(result[1], Is.EqualTo(new FilterOption("cheese", 7)));
+            Assert.That(result[2], Is.EqualTo(new FilterOption("flour", 2)));
+        });
+    }
+
 }

@@ -1,6 +1,6 @@
 namespace ApplicationCore.Common.Types;
 
-public enum CategoryOrderBy {
+public enum FilterOptionOrderBy {
     TITLE,
     COUNT
 }
