@@ -5,7 +5,7 @@ using ApplicationCore.Model;
 namespace ApplicationCore.Tests;
 
 [TestFixture]
-// The Setup() and TearDown() methods are used because the [NonParallelizable] attribute does not work correctly.
+// The Setup() method is used because the [NonParallelizable] attribute does not work correctly.
 // With normal [SetUp] and [TearDown] methods, the tests are run in parallel, which causes issues with file access.
 // The solution is to use a different database file for each test.
 public class SqliteServiceTests
