@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Security.Cryptography;
 using ApplicationCore.Model;
 
@@ -11,15 +12,11 @@ public class SqliteServiceTests
 {
     private static SqliteService Setup(string dbPath)
     {
-        return new SqliteService(dbPath);
-    }
-
-    private static void TearDown(string dbPath)
-    {
         if (File.Exists(dbPath))
         {
             File.Delete(dbPath);
         }
+        return new SqliteService(dbPath);
     }
 
     [Test]
@@ -31,8 +28,6 @@ public class SqliteServiceTests
         await sqliteService.InitializeAsync();
 
         Assert.That(File.Exists(dbPath), Is.True);
-
-        TearDown(dbPath);
     }
 
     [Test]
@@ -45,9 +40,13 @@ public class SqliteServiceTests
 
         Assert.DoesNotThrowAsync(async () =>
         {
-            await sqliteService.QueryAsync("SELECT 1");
+            await using (DbDataReader reader = await sqliteService.QueryAsync("SELECT 1"))
+            {
+                while (await reader.ReadAsync())
+                {
+                    // Do nothing, just read the data
+                }
+            }
         });
-
-        TearDown(dbPath);
     }
 }
