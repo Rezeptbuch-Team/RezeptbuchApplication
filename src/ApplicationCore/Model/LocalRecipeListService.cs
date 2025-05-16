@@ -12,8 +12,8 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
 
         #region create the SQL query and parameters
         Dictionary<string, object> parameters = new() {
-            { "$limit", filter.count },
-            { "$offset", filter.offset }
+            { "$limit", filter.Count },
+            { "$offset", filter.Offset }
         };
 
         string sql = @"SELECT DISTINCT r.hash AS hash, r.title AS title, 
@@ -24,44 +24,44 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
                         FROM recipes r 
                         JOIN recipe_category rc ON r.hash = rc.hash 
                         JOIN categories c ON rc.category_id = c.id ";
-        if (filter.availableIngredients.Count > 0) {
+        if (filter.Ingredients.Count > 0) {
             sql += "JOIN recipe_ingredient ri ON r.hash = ri.hash ";
             sql += "JOIN ingredients i ON ri.ingredient_id = i.id ";
         }
 
-        if (filter.categories.Count > 0) {
+        if (filter.Categories.Count > 0) {
             sql += "WHERE c.name IN (";
             // add $cat1, $cat2, ... to the sql query
-            for (int i = 0; i < filter.categories.Count; i++) {
+            for (int i = 0; i < filter.Categories.Count; i++) {
                 sql += $"$cat{i + 1}";
-                if (i < filter.categories.Count - 1) {
+                if (i < filter.Categories.Count - 1) {
                     sql += ", ";
                 }
 
-                parameters.Add($"$cat{i + 1}", filter.categories[i]);
+                parameters.Add($"$cat{i + 1}", filter.Categories[i]);
             }   
             sql += ") ";
         }
-        if (filter.availableIngredients.Count > 0) {
-            if (filter.categories.Count > 0) {
+        if (filter.Ingredients.Count > 0) {
+            if (filter.Categories.Count > 0) {
                 sql += "AND ";
             } else {
                 sql += "WHERE ";
             }
             sql += "i.name IN (";
             // add $ing1, $ing2, ... to the sql query
-            for (int i = 0; i < filter.availableIngredients.Count; i++) {
+            for (int i = 0; i < filter.Ingredients.Count; i++) {
                 sql += $"$ing{i + 1}";
-                if (i < filter.availableIngredients.Count - 1) {
+                if (i < filter.Ingredients.Count - 1) {
                     sql += ", ";
                 }
 
-                parameters.Add($"$ing{i + 1}", filter.availableIngredients[i]);
+                parameters.Add($"$ing{i + 1}", filter.Ingredients[i]);
             }   
             sql += ") ";
         }
-        sql += "ORDER BY " + (filter.orderBy == OrderBy.TITLE ? "title " : "cooking_time ");
-        sql += filter.order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += "ORDER BY " + (filter.OrderBy == OrderBy.TITLE ? "title " : "cooking_time ");
+        sql += filter.Order == Order.DESCENDING ? "DESC " : "ASC ";
         sql += @"LIMIT $limit 
                 OFFSET $offset;";
         #endregion
@@ -78,8 +78,8 @@ public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRe
 
             try {
                 // find the recipe by hash
-                RecipeEntry existingRecipe = recipes.First(r => r.hash == hash);
-                existingRecipe.categories.Add(category);
+                RecipeEntry existingRecipe = recipes.First(r => r.Hash == hash);
+                existingRecipe.Categories.Add(category);
             } catch (InvalidOperationException) {
                 // recipe not found, create a new recipe entry
                 RecipeEntry recipeEntry = new(hash, title, description, imagePath, [category], cookingTime);

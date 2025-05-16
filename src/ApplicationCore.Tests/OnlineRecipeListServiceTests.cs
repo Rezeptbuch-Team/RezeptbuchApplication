@@ -128,22 +128,22 @@ public class OnlineRecipeListServiceTests
             Assert.That(result, Has.Count.EqualTo(2));
             #region first recipe entry
             Assert.Multiple(() => {
-                Assert.That(result[0].hash, Is.EqualTo("asdafc"));
-                Assert.That(result[0].title, Is.EqualTo("title1"));
-                Assert.That(result[0].description, Is.EqualTo("description1"));
-                Assert.That(result[0].cookingTime, Is.EqualTo(15));
-                Assert.That(result[0].categories, Does.Contain("category1"));
-                Assert.That(result[0].categories, Does.Contain("category2"));
+                Assert.That(result[0].Hash, Is.EqualTo("asdafc"));
+                Assert.That(result[0].Title, Is.EqualTo("title1"));
+                Assert.That(result[0].Description, Is.EqualTo("description1"));
+                Assert.That(result[0].CookingTime, Is.EqualTo(15));
+                Assert.That(result[0].Categories, Does.Contain("category1"));
+                Assert.That(result[0].Categories, Does.Contain("category2"));
             });
             #endregion
             #region second recipe entry
             Assert.Multiple(() => {
-                Assert.That(result[1].hash, Is.EqualTo("agdgd"));
-                Assert.That(result[1].title, Is.EqualTo("title2"));
-                Assert.That(result[1].description, Is.EqualTo("description2"));
-                Assert.That(result[1].cookingTime, Is.EqualTo(30));
-                Assert.That(result[1].categories, Does.Contain("category1"));
-                Assert.That(result[1].categories, Does.Contain("category2"));
+                Assert.That(result[1].Hash, Is.EqualTo("agdgd"));
+                Assert.That(result[1].Title, Is.EqualTo("title2"));
+                Assert.That(result[1].Description, Is.EqualTo("description2"));
+                Assert.That(result[1].CookingTime, Is.EqualTo(30));
+                Assert.That(result[1].Categories, Does.Contain("category1"));
+                Assert.That(result[1].Categories, Does.Contain("category2"));
             });
             #endregion
         });
@@ -349,8 +349,8 @@ public class OnlineRecipeListServiceTests
 
         #region Assert that the image is downloaded
         Assert.Multiple(() => {
-            Assert.That(result[0].imagePath, Is.EqualTo(expectedFilePaths[0]));
-            Assert.That(result[1].imagePath, Is.EqualTo(expectedFilePaths[1]));
+            Assert.That(result[0].ImagePath, Is.EqualTo(expectedFilePaths[0]));
+            Assert.That(result[1].ImagePath, Is.EqualTo(expectedFilePaths[1]));
         });
         #endregion
     }

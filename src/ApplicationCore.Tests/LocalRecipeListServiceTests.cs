@@ -64,9 +64,9 @@ public class LocalRecipeListServiceTests
             It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
-                p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
-                p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
-                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0])
+                p.ContainsKey("$limit") && p["$limit"].Equals(filter.Count) &&
+                p.ContainsKey("$offset") && p["$offset"].Equals(filter.Offset) &&
+                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.Categories[0])
             )
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -126,12 +126,12 @@ public class LocalRecipeListServiceTests
             It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
-                p.ContainsKey("$limit") && p["$limit"].Equals(filter.count) &&
-                p.ContainsKey("$offset") && p["$offset"].Equals(filter.offset) &&
-                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.categories[0]) &&
-                p.ContainsKey("$cat2") && p["$cat2"].Equals(filter.categories[1]) &&
-                p.ContainsKey("$ing1") && p["$ing1"].Equals(filter.availableIngredients[0]) &&
-                p.ContainsKey("$ing2") && p["$ing2"].Equals(filter.availableIngredients[1])
+                p.ContainsKey("$limit") && p["$limit"].Equals(filter.Count) &&
+                p.ContainsKey("$offset") && p["$offset"].Equals(filter.Offset) &&
+                p.ContainsKey("$cat1") && p["$cat1"].Equals(filter.Categories[0]) &&
+                p.ContainsKey("$cat2") && p["$cat2"].Equals(filter.Categories[1]) &&
+                p.ContainsKey("$ing1") && p["$ing1"].Equals(filter.Ingredients[0]) &&
+                p.ContainsKey("$ing2") && p["$ing2"].Equals(filter.Ingredients[1])
             )
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -188,20 +188,20 @@ public class LocalRecipeListServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0].hash, Is.EqualTo("h1"));
-            Assert.That(result[0].title, Is.EqualTo("recipe1"));
-            Assert.That(result[0].description, Is.EqualTo("description1"));
-            Assert.That(result[0].imagePath, Is.EqualTo("image_path1"));
-            Assert.That(result[0].categories, Contains.Item("category1"));
-            Assert.That(result[0].categories, Contains.Item("category2"));
-            Assert.That(result[0].cookingTime, Is.EqualTo(30));
+            Assert.That(result[0].Hash, Is.EqualTo("h1"));
+            Assert.That(result[0].Title, Is.EqualTo("recipe1"));
+            Assert.That(result[0].Description, Is.EqualTo("description1"));
+            Assert.That(result[0].ImagePath, Is.EqualTo("image_path1"));
+            Assert.That(result[0].Categories, Contains.Item("category1"));
+            Assert.That(result[0].Categories, Contains.Item("category2"));
+            Assert.That(result[0].CookingTime, Is.EqualTo(30));
 
-            Assert.That(result[1].hash, Is.EqualTo("h2"));
-            Assert.That(result[1].categories, Contains.Item("category1"));
-            Assert.That(result[1].categories, Contains.Item("category2"));
+            Assert.That(result[1].Hash, Is.EqualTo("h2"));
+            Assert.That(result[1].Categories, Contains.Item("category1"));
+            Assert.That(result[1].Categories, Contains.Item("category2"));
 
-            Assert.That(result[2].hash, Is.EqualTo("h4"));
-            Assert.That(result[2].categories, Contains.Item("category2"));
+            Assert.That(result[2].Hash, Is.EqualTo("h4"));
+            Assert.That(result[2].Categories, Contains.Item("category2"));
         });
 
     }

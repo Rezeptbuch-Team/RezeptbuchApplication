@@ -31,23 +31,23 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
     public string BuildListUrl(Filter filter)
     {
         string url = "/list?";
-        url += "count=" + filter.count.ToString() + "&";
-        url += "offset=" + filter.offset.ToString();
-        if (filter.orderBy == OrderBy.COOKINGTIME)
+        url += "count=" + filter.Count.ToString() + "&";
+        url += "offset=" + filter.Offset.ToString();
+        if (filter.OrderBy == OrderBy.COOKINGTIME)
         {
             url += "&order_by=cooking_time&";
         }
-        if (filter.order == Order.DESCENDING)
+        if (filter.Order == Order.DESCENDING)
         {
             url += "&order=desc";
         }
-        if (filter.categories.Count > 0)
+        if (filter.Categories.Count > 0)
         {
             url += "&categories=";
-            for (int i = 0; i < filter.categories.Count; i++)
+            for (int i = 0; i < filter.Categories.Count; i++)
             {
-                url += filter.categories[i];
-                if (i < filter.categories.Count - 1)
+                url += filter.Categories[i];
+                if (i < filter.Categories.Count - 1)
                 {
                     url += ",";
                 }
@@ -94,13 +94,13 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         {
             foreach (RecipeEntry recipeEntry in recipesEntries)
             {
-                string imageUrl = "/images/" + recipeEntry.hash + ".png";
+                string imageUrl = "/images/" + recipeEntry.Hash + ".png";
                 try
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
                     if (response.IsSuccessStatusCode)
                     {
-                        using FileStream fileStream = new(recipeEntry.imagePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                        using FileStream fileStream = new(recipeEntry.ImagePath, FileMode.Create, FileAccess.Write, FileShare.None);
                         await response.Content.CopyToAsync(fileStream);
                     }
                     else
