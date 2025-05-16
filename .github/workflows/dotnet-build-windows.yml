@@ -26,3 +26,8 @@ jobs:
       run: dotnet restore src/GUI/GUI.csproj
     - name: Build
       run: dotnet build src/GUI/GUI.csproj -c Release -f:net8.0-windows10.0.19041.0
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        path: .\**\AppPackages\**\*.*
+            
