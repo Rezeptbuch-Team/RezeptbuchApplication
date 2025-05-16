@@ -120,7 +120,7 @@ public class OnlineRecipeListServiceTests
 
         #region Act
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
-        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        List<RecipeEntry> result = await service.GetRecipeList(filter);
         #endregion
 
         #region Assert
@@ -197,7 +197,7 @@ public class OnlineRecipeListServiceTests
 
         #region Act
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
-        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        List<RecipeEntry> result = await service.GetRecipeList(filter);
         #endregion
 
 
@@ -276,7 +276,7 @@ public class OnlineRecipeListServiceTests
 
         #region Act
         Filter filter = new(OrderBy.COOKINGTIME, Order.DESCENDING, ["category1", "category2"], null, 10, 0);
-        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        List<RecipeEntry> result = await service.GetRecipeList(filter);
         #endregion
 
         #region Assert that the image is downloaded
@@ -344,7 +344,7 @@ public class OnlineRecipeListServiceTests
 
         #region Act
         Filter filter = new(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null, 10, 0);
-        List<RecipeEntry> result = await service.GetOnlineRecipeList(filter);
+        List<RecipeEntry> result = await service.GetRecipeList(filter);
         #endregion
 
         #region Assert that the image is downloaded

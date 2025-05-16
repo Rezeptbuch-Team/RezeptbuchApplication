@@ -73,7 +73,7 @@ public class LocalRecipeListServiceTests
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<RecipeEntry> result = await localRecipeListService.GetLocalRecipeList(filter);
+        List<RecipeEntry> result = await localRecipeListService.GetRecipeList(filter);
 
         // check that the queryAsync method was called
         mockDatabaseService.Verify();
@@ -138,7 +138,7 @@ public class LocalRecipeListServiceTests
 
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<RecipeEntry> result = await localRecipeListService.GetLocalRecipeList(filter);
+        List<RecipeEntry> result = await localRecipeListService.GetRecipeList(filter);
 
         // check that the queryAsync method was called
         mockDatabaseService.Verify();
@@ -182,7 +182,7 @@ public class LocalRecipeListServiceTests
         
         // create the service and call the method
         LocalRecipeListService localRecipeListService = new(mockDatabaseService.Object);
-        List<RecipeEntry> result = await localRecipeListService.GetLocalRecipeList(filter);
+        List<RecipeEntry> result = await localRecipeListService.GetRecipeList(filter);
 
         // check that the result is correct
         Assert.Multiple(() =>

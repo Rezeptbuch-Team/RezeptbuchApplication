@@ -6,7 +6,7 @@ namespace ApplicationCore.Model;
 
 public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRecipeListService
 {
-    public async Task<List<RecipeEntry>> GetLocalRecipeList(Filter filter) {
+    public async Task<List<RecipeEntry>> GetRecipeList(Filter filter) {
 
         List<RecipeEntry> recipes = [];
 
