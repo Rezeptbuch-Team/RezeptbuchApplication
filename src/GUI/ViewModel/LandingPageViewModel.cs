@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GUI.View;
+using Microsoft.Maui.Controls;
 
 namespace GUI.ViewModel;
 

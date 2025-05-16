@@ -5,7 +5,7 @@
              x:Class="GUI.View.ListRemoteRecipeView"
              xmlns:viewmodel="clr-namespace:GUI.ViewModel"
              xmlns:types="clr-namespace:ApplicationCore.Common.Types;assembly=ApplicationCore"
-             x:DataType="viewmodel:ListLocalRecipeViewModel">
+             x:DataType="viewmodel:ListRemoteRecipeViewModel">
     <ContentPage.Content>
         <Grid
             RowDefinitions="60, *"
@@ -28,13 +28,13 @@
             
             <ListView
                 Grid.Row="1"
-                ItemsSource="{Binding Recipes}">
+                ItemsSource="{Binding RecipeEntries}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell
-                            x:DataType="types:Recipe">
+                            x:DataType="types:RecipeEntry">
                             <Grid
-                                ColumnDefinitions="25, 100, *">
+                                ColumnDefinitions="150, 250, *">
                                 <Label
                                     Grid.Column="0"
                                     Text="{Binding Path=Hash}"/>
