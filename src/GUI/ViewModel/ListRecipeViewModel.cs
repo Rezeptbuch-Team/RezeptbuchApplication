@@ -6,20 +6,20 @@ namespace GUI.ViewModel;
 
 public partial class ListRecipeViewModel : ObservableObject
 {
-    private readonly IOnlineRecipeListService _recipeListService;
+    private readonly IRecipeListService _recipeListService;
     
     [ObservableProperty] 
     private List<RecipeEntry> _recipeEntries;
     
-    public ListRecipeViewModel(IOnlineRecipeListService onlineRecipeListService)
+    public ListRecipeViewModel(IRecipeListService recipeListService)
     {
-        _recipeListService = onlineRecipeListService;
+        _recipeListService = recipeListService;
         RecipeEntries = [];
-        RefreshRecipes(new Filter(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], 10, 0));
+        RefreshRecipes(new Filter(OrderBy.TITLE, Order.ASCENDING, ["category1", "category2"], null,10, 0));
     }
 
     private async Task RefreshRecipes(Filter filter)
     {
-        RecipeEntries = await _recipeListService.GetOnlineRecipeList(filter);
+        RecipeEntries = await _recipeListService.GetRecipeList(filter);
     }
 }

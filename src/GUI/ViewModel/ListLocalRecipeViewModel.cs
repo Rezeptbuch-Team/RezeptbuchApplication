@@ -7,10 +7,14 @@ namespace GUI.ViewModel;
 
 public partial class ListLocalRecipeViewModel : ListRecipeViewModel
 {
-    [ObservableProperty] private string _text;
+    private readonly ILocalRecipeListService _localRecipeListService;
     
-    public ListLocalRecipeViewModel(IOnlineRecipeListService onlineRecipeListService) : base(onlineRecipeListService)
+    [ObservableProperty] 
+    private string _text;
+    
+    public ListLocalRecipeViewModel(ILocalRecipeListService recipeListService) : base(recipeListService)
     {
+        _localRecipeListService = recipeListService;
         Text = "Test DataBinding";
     }
 }

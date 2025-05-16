@@ -27,6 +27,9 @@ public static class MauiProgram
 			client.BaseAddress = new Uri("http://localhost:2222/list/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
 
+		builder.Services.AddSingleton<IDatabaseService, SqliteService>();
+		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
+
 		// add Views and ViewModels
 		builder.Services.AddTransient<ListLocalRecipeView>();
 		builder.Services.AddTransient<ListLocalRecipeViewModel>();

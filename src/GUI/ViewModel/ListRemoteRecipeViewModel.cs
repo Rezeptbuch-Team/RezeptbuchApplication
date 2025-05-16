@@ -7,7 +7,7 @@ namespace GUI.ViewModel;
 
 public partial class ListRemoteRecipeViewModel : ListRecipeViewModel
 {
-    public ListRemoteRecipeViewModel(IOnlineRecipeListService onlineRecipeListService) : base(onlineRecipeListService)
+    public ListRemoteRecipeViewModel(IOnlineRecipeListService recipeListService) : base(recipeListService)
     {
     }
     
