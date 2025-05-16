@@ -1,34 +1,159 @@
-﻿using ApplicationCore.Common.Types;
+﻿using System.Data.Common;
+using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class LocalRecipeListService() : ILocalRecipeListService
+public class LocalRecipeListService(IDatabaseService databaseService) : ILocalRecipeListService
 {
-
-    public async Task<List<RecipeEntry>> GetLocalRecipeList(Filter filter) {
+    public async Task<List<RecipeEntry>> GetRecipeList(Filter filter) {
 
         List<RecipeEntry> recipes = [];
-        // get from local database using filters
 
-        // example data
-        List<string> categories = ["category1", "category2"];
-        recipes.Add(new("zx83hd9kwe", "Chili con Carne", "Würziges Hackfleischgericht mit Bohnen und Mais", "imagePath11", categories, 30));
-        recipes.Add(new("pl92md4lkq", "Risotto", "Cremiges Risotto mit Pilzen und Parmesan", "imagePath12", categories, 35));
-        recipes.Add(new("vk49pd3hma", "Burger", "Saftiger Rindfleisch-Burger mit Käse und Salat", "imagePath13", categories, 25));
-        recipes.Add(new("qw82bf9skd", "Tacos", "Mexikanische Tacos mit Hähnchen und Avocado", "imagePath14", categories, 20));
-        recipes.Add(new("ms94dk3pla", "Quiche Lorraine", "Herzhafter Kuchen mit Speck und Käse", "imagePath15", categories, 40));
-        recipes.Add(new("bn23jf4xka", "Shakshuka", "Orientalisches Gericht mit Eiern in Tomatensauce", "imagePath16", categories, 25));
-        recipes.Add(new("lk73hs9twd", "Frittata", "Italienisches Omelett mit Gemüse und Käse", "imagePath17", categories, 20));
-        recipes.Add(new("cm92sk5xba", "Pho", "Vietnamesische Nudelsuppe mit Rindfleisch", "imagePath18", categories, 50));
-        recipes.Add(new("xp84hs3nka", "Pad Thai", "Thailändische gebratene Nudeln mit Tofu und Garnelen", "imagePath19", categories, 30));
-        recipes.Add(new("ft49dl2fqa", "Currywurst", "Gegrillte Wurst mit würziger Currysauce", "imagePath20", categories, 15));
-        recipes.Add(new("mn63ks8hla", "Eintopf", "Deftiger Gemüseeintopf mit Würstchen", "imagePath21", categories, 40));
-        recipes.Add(new("kl39fa4sqa", "Gulasch", "Herzhaftes Gulasch mit Paprika und Zwiebeln", "imagePath22", categories, 90));
-        recipes.Add(new("sq29dn7kla", "Poke Bowl", "Frische Bowl mit Lachs, Reis und Gemüse", "imagePath23", categories, 20));
-        recipes.Add(new("jx84md9zka", "Zitronenkuchen", "Saftiger Zitronenkuchen mit Zuckerguss", "imagePath24", categories, 50));
-        recipes.Add(new("wr93hf6pla", "Moussaka", "Griechischer Auflauf mit Aubergine und Hackfleisch", "imagePath25", categories, 60));
+        #region create the SQL query and parameters
+        Dictionary<string, object> parameters = new() {
+            { "$limit", filter.Count },
+            { "$offset", filter.Offset }
+        };
+
+        string sql = @"SELECT DISTINCT r.hash AS hash, r.title AS title, 
+                                r.description AS description, 
+                                r.image_path AS image_path,
+                                r.cooking_time AS cooking_time,
+                                c.name AS category
+                        FROM recipes r 
+                        JOIN recipe_category rc ON r.hash = rc.hash 
+                        JOIN categories c ON rc.category_id = c.id ";
+        if (filter.Ingredients.Count > 0) {
+            sql += "JOIN recipe_ingredient ri ON r.hash = ri.hash ";
+            sql += "JOIN ingredients i ON ri.ingredient_id = i.id ";
+        }
+
+        if (filter.Categories.Count > 0) {
+            sql += "WHERE c.name IN (";
+            // add $cat1, $cat2, ... to the sql query
+            for (int i = 0; i < filter.Categories.Count; i++) {
+                sql += $"$cat{i + 1}";
+                if (i < filter.Categories.Count - 1) {
+                    sql += ", ";
+                }
+
+                parameters.Add($"$cat{i + 1}", filter.Categories[i]);
+            }   
+            sql += ") ";
+        }
+        if (filter.Ingredients.Count > 0) {
+            if (filter.Categories.Count > 0) {
+                sql += "AND ";
+            } else {
+                sql += "WHERE ";
+            }
+            sql += "i.name IN (";
+            // add $ing1, $ing2, ... to the sql query
+            for (int i = 0; i < filter.Ingredients.Count; i++) {
+                sql += $"$ing{i + 1}";
+                if (i < filter.Ingredients.Count - 1) {
+                    sql += ", ";
+                }
+
+                parameters.Add($"$ing{i + 1}", filter.Ingredients[i]);
+            }   
+            sql += ") ";
+        }
+        sql += "ORDER BY " + (filter.OrderBy == OrderBy.TITLE ? "title " : "cooking_time ");
+        sql += filter.Order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
+                OFFSET $offset;";
+        #endregion
+        
+        #region execute the query and get the recipes
+        using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
+        while (await resultReader.ReadAsync()) {
+            string hash = resultReader.GetString(0);
+            string title = resultReader.GetString(1);
+            string description = resultReader.GetString(2);
+            string imagePath = resultReader.GetString(3);
+            int cookingTime = resultReader.GetInt32(4);
+            string category = resultReader.GetString(5);
+
+            try {
+                // find the recipe by hash
+                RecipeEntry existingRecipe = recipes.First(r => r.Hash == hash);
+                existingRecipe.Categories.Add(category);
+            } catch (InvalidOperationException) {
+                // recipe not found, create a new recipe entry
+                RecipeEntry recipeEntry = new(hash, title, description, imagePath, [category], cookingTime);
+                recipes.Add(recipeEntry);
+            }
+        }
+        #endregion
 
         return recipes;
+    }
+
+    public async Task<List<FilterOption>> GetCategories(FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
+        List<FilterOption> categories = [];
+
+        #region create the SQL query and parameters
+        Dictionary<string, object> parameters = new() {
+            { "$limit", limit },
+            { "$offset", offset }
+        };
+        string sql = @"SELECT c.name AS name, COUNT(rc.hash) AS count
+                        FROM categories c
+                        JOIN recipe_category rc ON c.id = rc.category_id
+                        GROUP BY c.name ";
+        sql += "ORDER BY " + (orderBy == FilterOptionOrderBy.TITLE ? "name " : "count ");
+        sql += order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
+                OFFSET $offset;";
+        #endregion
+
+        #region execute the query and get the categories
+        using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
+        
+        while (await resultReader.ReadAsync()) {
+            string name = resultReader.GetString(0);
+            int count = resultReader.GetInt32(1);
+
+            FilterOption category = new(name, count);
+            categories.Add(category);
+        }
+        #endregion
+
+        return categories;
+    }
+
+    public async Task<List<FilterOption>> GetIngredients(FilterOptionOrderBy orderBy = FilterOptionOrderBy.TITLE, Order order = Order.DESCENDING, int limit = 100, int offset = 0) {
+        List<FilterOption> ingredients = [];
+
+        #region create the SQL query and parameters
+        Dictionary<string, object> parameters = new() {
+            { "$limit", limit },
+            { "$offset", offset }
+        };
+        string sql = @"SELECT i.name AS name, COUNT(ri.hash) AS count
+                        FROM ingredients i
+                        JOIN recipe_ingredient ri ON i.id = ri.ingredient_id
+                        GROUP BY i.name ";
+        sql += "ORDER BY " + (orderBy == FilterOptionOrderBy.TITLE ? "name " : "count ");
+        sql += order == Order.DESCENDING ? "DESC " : "ASC ";
+        sql += @"LIMIT $limit 
+                OFFSET $offset;";
+        #endregion
+
+        #region execute the query and get the categories
+        using DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters);
+        
+        while (await resultReader.ReadAsync()) {
+            string name = resultReader.GetString(0);
+            int count = resultReader.GetInt32(1);
+
+            FilterOption ingredient = new(name, count);
+            ingredients.Add(ingredient);
+        }
+        #endregion
+
+        return ingredients;
     }
 }

@@ -1,42 +1,54 @@
 ﻿using ApplicationCore.Interfaces;
 using ApplicationCore.Common.Types;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ApplicationCore.Model;
 
 // classes for json deserialization
-public class Recipe
+public class JsonRecipe
     {
-        public required string hash { get; set; }
-        public required string title { get; set; }
-        public required string description { get; set; }
-        public required string image_path { get; set; }
-        public required List<string> categories { get; set; }
-        public int cooking_time { get; set; }
+        [JsonPropertyName("hash")]
+        public required string Hash { get; set; }
+        [JsonPropertyName("title")]
+        public required string Title { get; set; }
+        [JsonPropertyName("description")]
+        public required string Description { get; set; }
+        [JsonPropertyName("categories")]
+        public required List<string> Categories { get; set; }
+        [JsonPropertyName("cooking_time")]
+        public int CookingTime { get; set; }
     }
 
-public class Root
+public class JsonRoot
 {
-    public required List<Recipe> recipes { get; set; }
+    [JsonPropertyName("recipes")]
+    public required List<JsonRecipe> Recipes { get; set; }
 }
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
 {
-    public string BuildUrl(Filter filter) {
-        string url = "?";
-        url += "count=" + filter.count.ToString() + "&";
-        url += "offset=" + filter.offset.ToString();
-        if (filter.orderBy == OrderBy.COOKINGTIME) {
+    public string BuildListUrl(Filter filter)
+    {
+        string url = "/list?";
+        url += "count=" + filter.Count.ToString() + "&";
+        url += "offset=" + filter.Offset.ToString();
+        if (filter.OrderBy == OrderBy.COOKINGTIME)
+        {
             url += "&order_by=cooking_time&";
         }
-        if (filter.order == Order.DESCENDING) {
+        if (filter.Order == Order.DESCENDING)
+        {
             url += "&order=desc";
         }
-        if (filter.categories.Count > 0) {
+        if (filter.Categories.Count > 0)
+        {
             url += "&categories=";
-            for (int i = 0; i < filter.categories.Count; i++) {
-                url += filter.categories[i];
-                if (i < filter.categories.Count - 1) {
+            for (int i = 0; i < filter.Categories.Count; i++)
+            {
+                url += filter.Categories[i];
+                if (i < filter.Categories.Count - 1)
+                {
                     url += ",";
                 }
             }
@@ -44,36 +56,71 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         return url;
     }
 
-    public async Task<List<RecipeEntry>> GetOnlineRecipeList(Filter filter) {
-        string url = BuildUrl(filter);
+    public async Task<List<RecipeEntry>> GetRecipeList(Filter filter)
+    {
+        string listUrl = BuildListUrl(filter);
 
-        List<RecipeEntry> recipes = [];
-        // HttpResponseMessage response = await httpClient.GetAsync(url);
-        // if (response.IsSuccessStatusCode) {
-        //     string json = await response.Content.ReadAsStringAsync();
-        //     Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
-            
-        //     foreach (Recipe recipeEntry in extractedRoot.recipes) {
-        //         recipes.Add(new RecipeEntry(recipeEntry.hash,
-        //         recipeEntry.title, recipeEntry.description, recipeEntry.image_path, recipeEntry.categories,
-        //         recipeEntry.cooking_time));
-        //     }
-        // } 
-        
-        // download images and change the image path afterwards
+        List<RecipeEntry> recipesEntries = [];
+        #region API-Request
+        try
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(listUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                JsonRoot extractedRoot = JsonSerializer.Deserialize<JsonRoot>(json)!;
 
-        // example data
-        List<string> categories = ["category1", "category2"];
-        recipes.Add(new("hj73js9sjd", "Spaghetti Bolognese", "Klassische Spaghetti mit würziger Hackfleischsoße", "imagePath1", categories, 25));
-        recipes.Add(new("kd83k29fke", "Tomatensuppe", "Frische Tomatensuppe mit Basilikum und Croutons", "imagePath2", categories, 20));
-        recipes.Add(new("po92md8fsl", "Chicken Curry", "Hähnchenbrust in cremiger Currysauce mit Reis", "imagePath3", categories, 35));
-        recipes.Add(new("zj29ck3pwd", "Caesar Salad", "Knackiger Salat mit Hähnchenstreifen, Parmesan und Croutons", "imagePath4", categories, 15));
-        recipes.Add(new("lm29fk3hsa", "Pancakes", "Lockere Pancakes mit Ahornsirup und Früchten", "imagePath5", categories, 20));
-        recipes.Add(new("ns89dj4kas", "Vegetarische Lasagne", "Lasagne mit Gemüse, Tomatensauce und Käse", "imagePath6", categories, 40));
-        recipes.Add(new("ql49xk5bfa", "Sushi", "Selbstgemachte Maki- und Nigiri-Rollen", "imagePath7", categories, 60));
-        recipes.Add(new("vr83fj6hnd", "Griechischer Salat", "Salat mit Feta, Gurken, Tomaten und Oliven", "imagePath8", categories, 10));
-        recipes.Add(new("pk47gm2hsa", "Pizza Margherita", "Knusprige Pizza mit Tomatensauce, Mozzarella und Basilikum", "imagePath9", categories, 30));
-        recipes.Add(new("ab39dk2pla", "Ratatouille", "Französisches Gemüsegericht mit Zucchini, Aubergine und Paprika", "imagePath10", categories, 45));
-        return recipes;
+                foreach (JsonRecipe recipe in extractedRoot.Recipes)
+                {
+                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), recipe.Hash + ".png");
+                    recipesEntries.Add(new RecipeEntry(recipe.Hash,
+                    recipe.Title, recipe.Description, imagePath, recipe.Categories,
+                    recipe.CookingTime));
+                }
+            }
+            else
+            {
+                throw new Exception("Response error. Status code: " + response.StatusCode);
+            }
+        }
+        catch (HttpRequestException)
+        {
+            throw new Exception("API unreachable");
+        }
+        #endregion
+
+        #region download images
+        if (recipesEntries.Count > 0)
+        {
+            foreach (RecipeEntry recipeEntry in recipesEntries)
+            {
+                string imageUrl = "/images/" + recipeEntry.Hash + ".png";
+                try
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using FileStream fileStream = new(recipeEntry.ImagePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                        await response.Content.CopyToAsync(fileStream);
+                    }
+                    else
+                    {
+                        throw new Exception("Image download error. Status code: " + response.StatusCode);
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    throw new Exception("API unreachable");
+                }
+            }
+        }
+        #endregion
+
+        return recipesEntries;
+    }
+
+    public async Task<List<FilterOption>> GetCategories(FilterOptionOrderBy orderBy, Order order, int limit, int offset)
+    {
+        throw new NotImplementedException("GetCategories is not implemented in OnlineRecipeListService.");
     }
 }
