@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace ApplicationCore.Model;
 
 // classes for json deserialization
-public class Recipe
+public class JsonRecipe
     {
         [JsonPropertyName("hash")]
         public required string Hash { get; set; }
@@ -20,10 +20,10 @@ public class Recipe
         public int CookingTime { get; set; }
     }
 
-public class Root
+public class JsonRoot
 {
     [JsonPropertyName("recipes")]
-    public required List<Recipe> Recipes { get; set; }
+    public required List<JsonRecipe> Recipes { get; set; }
 }
 
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
@@ -68,9 +68,9 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                Root extractedRoot = JsonSerializer.Deserialize<Root>(json)!;
+                JsonRoot extractedRoot = JsonSerializer.Deserialize<JsonRoot>(json)!;
 
-                foreach (Recipe recipe in extractedRoot.Recipes)
+                foreach (JsonRecipe recipe in extractedRoot.Recipes)
                 {
                     string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), recipe.Hash + ".png");
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
