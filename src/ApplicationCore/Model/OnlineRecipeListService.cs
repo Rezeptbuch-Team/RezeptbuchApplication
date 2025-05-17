@@ -26,6 +26,12 @@ public class JsonRoot
     public required List<JsonRecipe> Recipes { get; set; }
 }
 
+public class JsonCategories
+{
+    [JsonPropertyName("categories")]
+    public required List<string> Categories { get; set; }
+}
+
 public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
 {
     public string BuildListUrl(Filter filter)
@@ -119,8 +125,30 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         return recipesEntries;
     }
 
-    public async Task<List<FilterOption>> GetCategories(FilterOptionOrderBy orderBy, Order order, int limit, int offset)
+    public async Task<List<string>> GetCategories(int limit, int offset)
     {
-        throw new NotImplementedException("GetCategories is not implemented in OnlineRecipeListService.");
+        string url = "/categories?count=" + limit.ToString() + "&offset=" + offset.ToString();
+
+        #region API-Request
+        try
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                JsonCategories extractedCategories = JsonSerializer.Deserialize<JsonCategories>(json)!;
+
+                return extractedCategories.Categories;
+            }
+            else
+            {
+                throw new Exception("Response error. Status code: " + response.StatusCode);
+            }
+        }
+        catch (HttpRequestException)
+        {
+            throw new Exception("API unreachable");
+        }
+        #endregion
     }
 }
