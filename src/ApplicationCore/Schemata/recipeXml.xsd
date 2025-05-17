@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="recipe">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element name="hash" type="xs:string"/>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="imageName" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="servings" type="xs:int"/>
+        <xs:element name="cookingTime" type="xs:int"/>
+        <!-- Categories-->
+        <xs:element name="categories">
+            <xs:complexType>
+            <xs:sequence>
+                <xs:element name="category" type="xs:string" maxOccurs="unbounded"/>
+            </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <!-- Instructions/recipe steps-->
+        <xs:element name="instructions">
+            <xs:complexType>
+            <xs:sequence>
+                <xs:element name="instruction" maxOccurs="unbounded">
+                    <xs:complexType mixed="true">
+                    <xs:sequence>
+                        <xs:element name="ingredient" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:attribute name="name" type="xs:string" use="required"/>
+                                <xs:attribute name="amount" type="xs:int" use="required"/>
+                                <xs:attribute name="unit" type="xs:string" use="required"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    </xs:complexType>
+                </xs:element>      
+            </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+
+    </xs:sequence>
+    </xs:complexType>
+</xs:element>
+
+</xs:schema>

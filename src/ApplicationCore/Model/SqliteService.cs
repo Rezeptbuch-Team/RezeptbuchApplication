@@ -39,7 +39,7 @@ public class SqliteService : IDatabaseService {
         }
 
         #region Get schema
-        string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Database", "Scripts", "schema.sql");
+        string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Schemata", "database.sql");
         if (!File.Exists(schemaFilePath)) {
             throw new FileNotFoundException("Schema file not found", schemaFilePath);
         }

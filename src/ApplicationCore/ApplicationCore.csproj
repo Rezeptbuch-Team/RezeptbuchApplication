@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
 
-    <Content Include="Database/Scripts/schema.sql" CopyToOutputDirectory="Always" />
-    <Content Include="Database/Scripts/schema.sql" CopyToOutputDirectory="Always" />
+    <Content Include="Schemata/database.sql" CopyToOutputDirectory="Always" />
+    <Content Include="Schemata/recipeXml.xsd" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
