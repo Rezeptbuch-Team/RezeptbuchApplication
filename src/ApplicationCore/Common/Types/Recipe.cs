@@ -29,9 +29,20 @@ public class Recipe
     public required List<string> Categories { get; set; }
     public List<Instruction> Instructions { get; set; } = [];
 
-    public List<Ingredient> GetIngredients()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="servings">different serving size</param>
+    /// <returns></returns>
+    public List<Ingredient> GetIngredients(float? servings = null)
     {
-        List<Ingredient> ingredients = [];
+        float amountFactor = 1;
+        if (servings != null)
+        {
+            amountFactor = (float)servings / Servings;
+        }
+
+        List <Ingredient> ingredients = [];
 
         foreach (Instruction instruction in Instructions)
         {
@@ -39,9 +50,10 @@ public class Recipe
             {
                 if (item is Ingredient ingredient)
                 {
+                    ingredient.Amount = (int)(ingredient.Amount * amountFactor);
+
                     Ingredient? existingIngredient = ingredients
                         .FirstOrDefault(i => new IngredientNameUnitComparer().Equals(i, ingredient));
-
                     if (existingIngredient != null)
                     {
                         existingIngredient.Amount += ingredient.Amount;
@@ -53,7 +65,7 @@ public class Recipe
                 }
             }
         }
-        
+
         return ingredients.GroupBy(ing => ing.Name)
                             .SelectMany(group => group)
                             .ToList();

@@ -57,7 +57,7 @@ public class RecipeGetIngredientsTests
                 Name="basil", Amount=3, Unit="pieces"
             }
         ];
-        
+
         Assert.That(baseRecipe.GetIngredients(), Is.EqualTo(expectedIngredients));
     }
 
@@ -129,7 +129,7 @@ public class RecipeGetIngredientsTests
 
         Assert.That(baseRecipe.GetIngredients(), Is.EqualTo(expectedIngredients));
     }
-    
+
     [Test]
     public void GetIngredients_ShouldCorrectlyExtract_DuplicateIngredients_AndSumAmount_WhenSameUnits()
     {
@@ -158,5 +158,35 @@ public class RecipeGetIngredientsTests
         ];
 
         Assert.That(baseRecipe.GetIngredients(), Is.EqualTo(expectedIngredients));
+    }
+
+    [Test]
+    public void GetIngredients_ChangesAmount_WhenDifferentServingIsSet()
+    {
+        baseRecipe.Instructions = [
+            new Instruction(){
+                Items = [
+                    new Ingredient{
+                        Name="water", Amount=600, Unit="ml"
+                    },
+                    new Ingredient{
+                        Name="water", Amount=1, Unit="l"
+                    },
+                    new Ingredient{
+                        Name="water", Amount=200, Unit="ml"
+                    }
+                ]
+            }
+        ];
+        List<Ingredient> expectedIngredients = [
+            new Ingredient{
+                Name="water", Amount=1600, Unit="ml"
+            },
+            new Ingredient{
+                Name="water", Amount=2, Unit="l"
+            }
+        ];
+
+        Assert.That(baseRecipe.GetIngredients(baseRecipe.Servings*2), Is.EqualTo(expectedIngredients));
     }
 }
