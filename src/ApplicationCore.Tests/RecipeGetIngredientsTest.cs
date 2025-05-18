@@ -24,19 +24,6 @@ public class RecipeGetIngredientsTests
         };
     }
 
-    public class IngredientComparer : IEqualityComparer<Ingredient>
-    {
-        public bool Equals(Ingredient x, Ingredient y)
-        {
-            return x.Name == y.Name && x.Unit == y.Unit && x.Amount == y.Amount;
-        }
-
-        public int GetHashCode(Ingredient obj)
-        {
-            return HashCode.Combine(obj.Name, obj.Unit, obj.Amount);
-        }
-    }
-
     [Test]
     public void GetIngredients_ShouldCorrectlyExtract_SimpleIngredients()
     {
