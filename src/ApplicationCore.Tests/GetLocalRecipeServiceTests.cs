@@ -68,7 +68,7 @@ public class GetLocalRecipeServiceTests
     }
 
     [Test]
-    public async Task WillThrowError_IfXmlDoesNotFitSchema()
+    public void WillThrowError_IfXmlDoesNotFitSchema()
     {
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 
@@ -120,7 +120,7 @@ public class GetLocalRecipeServiceTests
     }
 
     [Test]
-    public async Task WillNotThrowError_IfXmlFitsSchema()
+    public void WillNotThrowError_IfXmlFitsSchema()
     {
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 
