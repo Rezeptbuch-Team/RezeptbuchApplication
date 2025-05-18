@@ -13,6 +13,7 @@ public class RecipeGetInstructionsTests
         baseRecipe = new()
         {
             Hash = "asd",
+            PublishOption = PublishOption.PUBLISHED,
             Title = "Pasta",
             ImagePath = "pasta.png",
             Description = "Simple pasta recipe.",

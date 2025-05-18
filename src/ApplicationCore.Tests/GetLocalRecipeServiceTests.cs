@@ -36,13 +36,16 @@ public class GetLocalRecipeServiceTests
         File.Copy(exampleRecipePath, absoluteFilePath);
 
         #region database mock
-        string expectedSql = @"SELECT file_path
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
-        table.Rows.Add("hjasdf.xml");
+        table.Columns.Add("is_download", typeof(int));
+        table.Columns.Add("is_published", typeof(int));
+        table.Columns.Add("is_modified", typeof(int));
+        table.Rows.Add(filePath, 0, 1, 0);
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -84,13 +87,16 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         #region mock database
-        string expectedSql = @"SELECT file_path
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
-        table.Rows.Add(filePath);
+        table.Columns.Add("is_download", typeof(int));
+        table.Columns.Add("is_published", typeof(int));
+        table.Columns.Add("is_modified", typeof(int));
+        table.Rows.Add(filePath, 0, 1, 0);
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -136,13 +142,16 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         #region mock database
-        string expectedSql = @"SELECT file_path
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
-        table.Rows.Add(filePath);
+        table.Columns.Add("is_download", typeof(int));
+        table.Columns.Add("is_published", typeof(int));
+        table.Columns.Add("is_modified", typeof(int));
+        table.Rows.Add(filePath, 0, 1, 0);
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -193,6 +202,7 @@ public class GetLocalRecipeServiceTests
         Recipe expectedRecipe = new()
         {
             Hash = "asd",
+            PublishOption = PublishOption.PUBLISHED,
             Title = "Pasta",
             ImagePath = "pasta.png",
             Description = "Simple pasta recipe.",
@@ -218,13 +228,16 @@ public class GetLocalRecipeServiceTests
         File.Copy(exampleRecipePath, absoluteFilePath);
         #endregion
         #region mock database
-        string expectedSql = @"SELECT file_path
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
-        table.Rows.Add(filePath);
+        table.Columns.Add("is_download", typeof(int));
+        table.Columns.Add("is_published", typeof(int));
+        table.Columns.Add("is_modified", typeof(int));
+        table.Rows.Add(filePath, 0, 1, 0);
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 

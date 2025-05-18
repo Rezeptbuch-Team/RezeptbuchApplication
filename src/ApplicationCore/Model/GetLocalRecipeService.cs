@@ -11,8 +11,8 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
 {
     public async Task<Recipe> GetRecipe(string hash)
     {
-        #region request filepath from database
-        string sql = @"SELECT file_path
+        #region request filepath and publishinformation from database
+        string sql = @"SELECT file_path, is_download, is_published, is_modified
                         FROM recipes
                         WHERE hash = $hash;";
 
@@ -20,6 +20,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
             { "$hash", hash }
         };
         string filePath;
+        PublishOption publishOption;
         await using (DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters))
         {
             if (await resultReader.ReadAsync())
@@ -27,6 +28,14 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
                 try
                 {
                     filePath = resultReader.GetString(0);
+                    bool is_download = resultReader.GetInt32(1) > 0;
+                    bool is_published = resultReader.GetInt32(2) > 0;
+                    bool is_modified = resultReader.GetInt32(3) > 0;
+
+                    if (is_download) publishOption = PublishOption.FORBIDDEN;
+                    else if (!is_published) publishOption = PublishOption.NOT_PUBLISHED;
+                    else if (is_published && is_modified) publishOption = PublishOption.OUTDATED;
+                    else publishOption = PublishOption.PUBLISHED;
                 }
                 catch (InvalidCastException)
                 {
@@ -75,7 +84,8 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
         XElement root = doc.Element("recipe")!;
         Recipe recipe = new()
         {
-            Hash = (string)root.Element("hash")!,
+            Hash = hash,
+            PublishOption = publishOption,
             Title = (string)root.Element("title")!,
             ImagePath = (string)root.Element("imageName")!,
             Description = (string)root.Element("description")!,

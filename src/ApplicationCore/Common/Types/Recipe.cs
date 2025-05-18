@@ -21,6 +21,7 @@ public class Instruction {
 public class Recipe
 {
     public required string Hash { get; set; }
+    public required PublishOption PublishOption { get; set; }
     public required string Title { get; set; }
     public required string ImagePath { get; set; }
     public required string Description { get; set; }
