@@ -42,15 +42,20 @@ public class Recipe
             amountFactor = (float)servings / Servings;
         }
 
-        List <Ingredient> ingredients = [];
+        List<Ingredient> ingredients = [];
 
         foreach (Instruction instruction in Instructions)
         {
             foreach (object item in instruction.Items)
             {
-                if (item is Ingredient ingredient)
+                if (item is Ingredient originalIngredient)
                 {
-                    ingredient.Amount = (int)(ingredient.Amount * amountFactor);
+                    Ingredient ingredient = new()
+                    {
+                        Name = originalIngredient.Name,
+                        Amount = (int)(originalIngredient.Amount * amountFactor),
+                        Unit = originalIngredient.Unit
+                    };
 
                     Ingredient? existingIngredient = ingredients
                         .FirstOrDefault(i => new IngredientNameUnitComparer().Equals(i, ingredient));
@@ -71,7 +76,6 @@ public class Recipe
                             .ToList();
     }
 
-
     public class IngredientNameUnitComparer : IEqualityComparer<Ingredient>
     {
         public bool Equals(Ingredient x, Ingredient y)
@@ -83,5 +87,38 @@ public class Recipe
         {
             return HashCode.Combine(obj.Name, obj.Unit);
         }
+    }
+
+    public List<Instruction> GetInstructions(float? servings = null)
+    {
+        if (servings == null) return Instructions;
+
+        float amountFactor = (float)servings / Servings;
+
+        List<Instruction> scaledInstructions = [];
+        foreach (Instruction orginalInstruction in Instructions)
+        {
+            Instruction newInstruction = new();
+            foreach (object item in orginalInstruction.Items)
+            {
+                if (item is string text)
+                {
+                    newInstruction.Items.Add(text);
+                }
+                else if (item is Ingredient orginalIngredient)
+                {
+                    Ingredient newIngredient = new()
+                    {
+                        Name = orginalIngredient.Name,
+                        Amount = (int)(orginalIngredient.Amount * amountFactor),
+                        Unit = orginalIngredient.Unit
+                    };
+                    newInstruction.Items.Add(newIngredient);
+                }
+            }
+            scaledInstructions.Add(newInstruction);
+        }
+        
+        return scaledInstructions;
     }
 }
