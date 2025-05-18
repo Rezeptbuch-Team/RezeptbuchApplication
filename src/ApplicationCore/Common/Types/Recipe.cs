@@ -9,6 +9,11 @@ public class Ingredient
     public override bool Equals(object obj) =>
         obj is Ingredient i &&
         Name == i.Name && Amount == i.Amount && Unit == i.Unit;
+
+    public override string ToString()
+    {
+        return Amount + " " + Unit + " " + Name;
+    }
 }
 
 public class Instruction {
