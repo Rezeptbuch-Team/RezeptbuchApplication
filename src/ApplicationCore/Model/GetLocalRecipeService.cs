@@ -56,7 +56,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
                 ValidationType = ValidationType.Schema
             };
             settings.Schemas.Add(null, xsdPath);
-            settings.ValidationEventHandler += new ValidationEventHandler(XmlError);
+            settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
 
             using (XmlReader reader = XmlReader.Create(filePath, settings))
             {
@@ -71,7 +71,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
         return new Recipe();
     }
     
-    static void XmlError(object? sender, ValidationEventArgs? args)
+    static void ValidationCallback(object? sender, ValidationEventArgs? args)
     {
         throw new Exception("Recipe XML-file does not fit schema");
     }

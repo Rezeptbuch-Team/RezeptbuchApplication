@@ -150,9 +150,18 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         GetLocalRecipeService service = new(mockDatabaseService.Object);
-        
+
         Assert.DoesNotThrowAsync(async () => await service.GetRecipe(hash));
 
         if (File.Exists(absoluteFilePath)) File.Delete(absoluteFilePath);
+    }
+
+    // business classes refers to classes that do not have [XML...] attributes
+    [Test]
+    public async Task WillCorrectlyDeserializeRecipeIntoBusinessClasses()
+    {
+        #region expected Recipe class (fitting exampleRecipe.xml)
+        
+        #endregion
     }
 }
