@@ -23,6 +23,5 @@ public class Recipe
     public required int Servings { get; set; }
     public required int CookingTime { get; set; }
     public required List<string> Categories { get; set; }
-    public List<string> Ingredients { get; set; } = [];
     public List<Instruction> Instructions { get; set; } = [];
 }

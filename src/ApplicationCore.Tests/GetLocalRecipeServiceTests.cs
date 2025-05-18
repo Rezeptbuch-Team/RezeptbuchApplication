@@ -199,7 +199,6 @@ public class GetLocalRecipeServiceTests
             Servings = 2,
             CookingTime = 20,
             Categories = ["Pasta", "Vegan"],
-            Ingredients = ["water", "pasta"],
             Instructions = instructions
         };
         #endregion
@@ -254,7 +253,6 @@ public class GetLocalRecipeServiceTests
             Assert.That(returnedRecipe.Description, Is.EqualTo(expectedRecipe.Description));
             Assert.That(returnedRecipe.Servings, Is.EqualTo(expectedRecipe.Servings));
             Assert.That(returnedRecipe.Categories, Is.EqualTo(expectedRecipe.Categories));
-            Assert.That(returnedRecipe.Ingredients, Is.EqualTo(expectedRecipe.Ingredients));
             for (int i = 0; i < returnedRecipe.Instructions.Count; i++)
             {
                 Assert.That(returnedRecipe.Instructions[i].Items, Is.EqualTo(expectedRecipe.Instructions[i].Items));

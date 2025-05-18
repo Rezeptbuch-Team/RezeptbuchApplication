@@ -101,12 +101,9 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
                         }
                         break;
                     case XElement elemNode when elemNode.Name == "ingredient":
-                        string ingredientName = (string)elemNode.Attribute("name")!;
-                        if (!recipe.Ingredients.Contains(ingredientName)) recipe.Ingredients.Add(ingredientName);
-
                         instructionItems.Add(new Ingredient
                         {
-                            Name = ingredientName,
+                            Name = (string)elemNode.Attribute("name")!,
                             Amount = (int)elemNode.Attribute("amount")!,
                             Unit = (string)elemNode.Attribute("unit")!
                         });
