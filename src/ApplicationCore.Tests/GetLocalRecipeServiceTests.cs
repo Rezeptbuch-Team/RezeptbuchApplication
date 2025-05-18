@@ -4,6 +4,7 @@ using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
 using Moq;
+using NUnit.Framework.Constraints;
 using NUnit.Framework.Internal;
 
 namespace ApplicationCore.Tests;
@@ -126,7 +127,7 @@ public class GetLocalRecipeServiceTests
         string hash = "exampleRecipe";
         string filePath = "exampleRecipe.xml";
 
-        string exampleRecipePath = Path.Combine(AppContext.BaseDirectory, "Ressources", "exampleRecipe.xml");
+        string exampleRecipePath = Path.Combine(AppContext.BaseDirectory, "Ressources", filePath);
 
         #region put example xml-file in appdata folder
         string absoluteFilePath = Path.Combine(appDataPath, filePath);
@@ -172,20 +173,20 @@ public class GetLocalRecipeServiceTests
         List<Instruction> instructions = [
             new Instruction(){
                 Items = [
-                    "Boil ",
+                    "Boil",
                     new Ingredient{
                         Name="water", Amount=600, Unit="ml"
                     },
-                    " in a large pot. Add ",
+                    "in a large pot. Add",
                     new Ingredient{
                         Name="pasta", Amount=200, Unit="g"
                     },
-                    " and cook until al dente."
+                    "and cook until al dente."
                 ]
             },
             new Instruction(){
                 Items = [
-                    "Serve"
+                    "Serve."
                 ]
             }
         ];
@@ -203,9 +204,61 @@ public class GetLocalRecipeServiceTests
         };
         #endregion
 
-        // get returned recipe (include mocking stuff)
-        Recipe returnedRecipe;
+        #region create filepaths
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 
-        Assert.That(returnedRecipe, Is.EqualTo(expectedRecipe));
+        string hash = "asd";
+        string filePath = "simpleExampleRecipe.xml";
+
+        string exampleRecipePath = Path.Combine(AppContext.BaseDirectory, "Ressources", filePath);
+        #endregion
+
+        #region put example xml-file in appdata folder
+        string absoluteFilePath = Path.Combine(appDataPath, filePath);
+        if (File.Exists(absoluteFilePath)) File.Delete(absoluteFilePath);
+        File.Copy(exampleRecipePath, absoluteFilePath);
+        #endregion
+        #region mock database
+        string expectedSql = @"SELECT file_path
+                                FROM recipes
+                                WHERE hash = $hash;";
+        #region create a fake DataTable to simulate the database response
+        DataTable table = new();
+        table.Columns.Add("file_path", typeof(string));
+        table.Rows.Add(filePath);
+        DbDataReader fakeReader = table.CreateDataReader();
+        #endregion
+
+        #region mock database controller
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.QueryAsync(
+            // check that the SQL query is correct
+            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            // check that the parameters are correct
+            It.Is<IDictionary<string, object>>(p =>
+                p.ContainsKey("$hash") && p["$hash"].Equals(hash)
+            )
+        )).ReturnsAsync(fakeReader).Verifiable();
+        #endregion
+        #endregion
+
+        GetLocalRecipeService service = new(mockDatabaseService.Object);
+
+        Recipe returnedRecipe = await service.GetRecipe(hash);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(returnedRecipe.Hash, Is.EqualTo(expectedRecipe.Hash));
+            Assert.That(returnedRecipe.Title, Is.EqualTo(expectedRecipe.Title));
+            Assert.That(returnedRecipe.ImagePath, Is.EqualTo(expectedRecipe.ImagePath));
+            Assert.That(returnedRecipe.Description, Is.EqualTo(expectedRecipe.Description));
+            Assert.That(returnedRecipe.Servings, Is.EqualTo(expectedRecipe.Servings));
+            Assert.That(returnedRecipe.Categories, Is.EqualTo(expectedRecipe.Categories));
+            Assert.That(returnedRecipe.Ingredients, Is.EqualTo(expectedRecipe.Ingredients));
+            for (int i = 0; i < returnedRecipe.Instructions.Count; i++)
+            {
+                Assert.That(returnedRecipe.Instructions[i].Items, Is.EqualTo(expectedRecipe.Instructions[i].Items));
+            }
+        });
     }
 }

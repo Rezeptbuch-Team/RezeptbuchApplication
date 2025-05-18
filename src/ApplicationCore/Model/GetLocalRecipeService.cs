@@ -97,7 +97,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
                     case XText textNode:
                         if (!string.IsNullOrWhiteSpace(textNode.Value))
                         {
-                            instructionItems.Add(textNode.Value);
+                            instructionItems.Add(string.Join(" ", textNode.Value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries)));
                         }
                         break;
                     case XElement elemNode when elemNode.Name == "ingredient":
