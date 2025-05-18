@@ -23,7 +23,15 @@ public class GetLocalRecipeServiceTests
     [Test]
     public async Task WillCorrectlyRequestFromDatabase()
     {
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
+
         string hash = "hjasdf";
+        string filePath = "hjasdf.xml";
+
+        string exampleRecipePath = Path.Combine(AppContext.BaseDirectory, "Ressources", "exampleRecipe.xml");
+        string absoluteFilePath = Path.Combine(appDataPath, filePath);
+        if (File.Exists(absoluteFilePath)) File.Delete(absoluteFilePath);
+        File.Copy(exampleRecipePath, absoluteFilePath);
 
         #region database mock
         string expectedSql = @"SELECT file_path
@@ -161,7 +169,7 @@ public class GetLocalRecipeServiceTests
     public async Task WillCorrectlyDeserializeRecipeIntoBusinessClasses()
     {
         #region expected Recipe class (fitting exampleRecipe.xml)
-        
+
         #endregion
     }
 }
