@@ -4,6 +4,7 @@ using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
 using Moq;
+using NUnit.Framework.Internal;
 
 namespace ApplicationCore.Tests;
 
@@ -168,9 +169,43 @@ public class GetLocalRecipeServiceTests
     public async Task WillCorrectlyReturnRecipe()
     {
         #region expected Recipe class (fitting exampleRecipe.xml)
-
+        List<Instruction> instructions = [
+            new Instruction(){
+                Items = [
+                    "Boil ",
+                    new Ingredient{
+                        Name="water", Amount=600, Unit="ml"
+                    },
+                    " in a large pot. Add ",
+                    new Ingredient{
+                        Name="pasta", Amount=200, Unit="g"
+                    },
+                    " and cook until al dente."
+                ]
+            },
+            new Instruction(){
+                Items = [
+                    "Serve"
+                ]
+            }
+        ];
+        Recipe expectedRecipe = new()
+        {
+            Hash = "asd",
+            Title = "Pasta",
+            ImagePath = "pasta.png",
+            Description = "Simple pasta recipe.",
+            Servings = 2,
+            CookingTime = 20,
+            Categories = ["Pasta", "Vegan"],
+            Ingredients = ["water", "pasta"],
+            Instructions = instructions
+        };
         #endregion
 
-        throw new NotImplementedException();
+        // get returned recipe (include mocking stuff)
+        Recipe returnedRecipe;
+
+        Assert.That(returnedRecipe, Is.EqualTo(expectedRecipe));
     }
 }

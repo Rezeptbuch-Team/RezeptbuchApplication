@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<recipe>
+    <hash>asd</hash>
+    <title>Pasta</title>
+    <imageName>pasta.png</imageName>
+    <description>Simple pasta recipe.</description>
+    <servings>2</servings>
+    <cookingTime>20</cookingTime>
+    <categories>
+        <category>Pasta</category>
+        <category>Vegan</category>
+    </categories>
+    <instructions>
+        <instruction>
+            Boil <ingredient name="water" amount="600" unit="ml"/> in a large pot. Add <ingredient name="pasta" amount="200" unit="g"/> and cook until al dente.
+        </instruction>
+        <instruction>
+            Serve.
+        </instruction>
+    </instructions>
+</recipe>
