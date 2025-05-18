@@ -164,12 +164,13 @@ public class GetLocalRecipeServiceTests
         if (File.Exists(absoluteFilePath)) File.Delete(absoluteFilePath);
     }
 
-    // business classes refers to classes that do not have [XML...] attributes
     [Test]
-    public async Task WillCorrectlyDeserializeRecipeIntoBusinessClasses()
+    public async Task WillCorrectlyReturnRecipe()
     {
         #region expected Recipe class (fitting exampleRecipe.xml)
 
         #endregion
+
+        throw new NotImplementedException();
     }
 }

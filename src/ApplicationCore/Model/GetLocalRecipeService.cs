@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
@@ -68,7 +69,59 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
         }
         #endregion
 
-        return new Recipe();
+        #region deserialize recipe xml
+        XDocument doc = XDocument.Parse(await File.ReadAllTextAsync(filePath));
+        // because the xml has been validated there is no need to check for null values
+        XElement root = doc.Element("recipe")!;
+        Recipe recipe = new()
+        {
+            Hash = (string)root.Element("hash")!,
+            Title = (string)root.Element("title")!,
+            ImagePath = (string)root.Element("imageName")!,
+            Description = (string)root.Element("description")!,
+            Servings = (int)root.Element("servings")!,
+            CookingTime = (int)root.Element("cookingTime")!,
+            Categories = root.Element("categories")!
+                              .Elements("category")
+                              .Select(content => (string)content)
+                              .ToList()
+        };
+        #region extract instructions and ingredients from xml
+        foreach (XElement instructionElement in root.Element("instructions")!.Elements())
+        {
+            List<object> instructionItems = [];
+            foreach (XNode node in instructionElement.Nodes())
+            {
+                switch (node)
+                {
+                    case XText textNode:
+                        if (!string.IsNullOrWhiteSpace(textNode.Value))
+                        {
+                            instructionItems.Add(textNode.Value);
+                        }
+                        break;
+                    case XElement elemNode when elemNode.Name == "ingredient":
+                        string ingredientName = (string)elemNode.Attribute("name")!;
+                        if (!recipe.Ingredients.Contains(ingredientName)) recipe.Ingredients.Add(ingredientName);
+
+                        instructionItems.Add(new Ingredient
+                        {
+                            Name = ingredientName,
+                            Amount = (int)elemNode.Attribute("amount")!,
+                            Unit = (string)elemNode.Attribute("unit")!
+                        });
+                        break;
+                }
+            }
+            recipe.Instructions.Add(new Instruction
+            {
+                Items = instructionItems
+            });
+        }
+        #endregion
+        #endregion
+
+        return recipe;
     }
     
     static void ValidationCallback(object? sender, ValidationEventArgs? args)
