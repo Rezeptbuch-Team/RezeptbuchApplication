@@ -16,11 +16,17 @@ public class Ingredient
     }
 }
 
-public class Instruction {
+public class Instruction
+{
     /// <summary>
     /// A list of text and ingredients
     /// </summary>
     public List<object> Items { get; set; } = [];
+
+    public override string ToString()
+    {
+        return string.Join(' ', Items);
+    }
 }
 
 public class Recipe
