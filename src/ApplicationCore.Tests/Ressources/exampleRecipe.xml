@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<recipe>
+    <hash>asdyxc</hash>
+    <title>Tomato Pasta</title>
+    <imageName>tomato_pasta.jpg</imageName>
+    <description>Simple tomato pasta recipe.</description>
+    <servings>2</servings>
+    <cookingTime>20</cookingTime>
+    <categories>
+        <category>Pasta</category>
+        <category>Vegan</category>
+    </categories>
+    <instructions>
+        <instruction>
+            Boil <ingredient name="water" amount="600" unit="ml"/>
+            in a large pot. Add 
+            <ingredient name="pasta" amount="200" unit="g"/>
+            and cook until al dente.
+        </instruction>
+        <instruction>
+            In a separate pan, heat 
+            <ingredient name="olive oil" amount="2" unit="tablespoons"/>
+            and add 
+            <ingredient name="garlic" amount="2" unit="cloves"/>
+            and 
+            <ingredient name="tomatoes" amount="400" unit="g"/>.
+        </instruction>
+    </instructions>
+</recipe>

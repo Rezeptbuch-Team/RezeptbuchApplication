@@ -18,6 +18,9 @@
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
 
     <Content Include="Ressources/test.png" CopyToOutputDirectory="Always" />
+    <Content Include="Ressources/wrongExampleRecipe.xml" CopyToOutputDirectory="Always" />
+    <Content Include="Ressources/exampleRecipe.xml" CopyToOutputDirectory="Always" />
+    <Content Include="Ressources/simpleExampleRecipe.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>

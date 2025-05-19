@@ -78,7 +78,8 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
 
                 foreach (JsonRecipe recipe in extractedRoot.Recipes)
                 {
-                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), recipe.Hash + ".png");
+                    string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
+                    string imagePath = Path.Combine(appDataPath, recipe.Hash + ".png");
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
                     recipe.Title, recipe.Description, imagePath, recipe.Categories,
                     recipe.CookingTime));

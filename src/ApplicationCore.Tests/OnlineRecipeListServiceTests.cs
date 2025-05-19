@@ -40,6 +40,8 @@ public class OnlineRecipeListServiceTests
     [SetUp]
     public void Setup()
     {
+        StartupService.AppDataFolder();
+
         HttpClient httpClient = new()
         {
             BaseAddress = new Uri("http://api.server.com/")
@@ -231,7 +233,7 @@ public class OnlineRecipeListServiceTests
     {
         #region Arrange
         #region create image paths and delete them if they exist
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         string[] expectedFilePaths = [
             Path.Combine(appDataPath, "asdafc.png"),
             Path.Combine(appDataPath, "agdgd.png")
@@ -310,7 +312,7 @@ public class OnlineRecipeListServiceTests
     {
         #region Arrange
         #region create image paths
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         string[] expectedFilePaths = [
             Path.Combine(appDataPath, "asdafc.png"),
             Path.Combine(appDataPath, "agdgd.png")
