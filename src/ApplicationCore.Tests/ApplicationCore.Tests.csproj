@@ -21,6 +21,7 @@
     <Content Include="Ressources/wrongExampleRecipe.xml" CopyToOutputDirectory="Always" />
     <Content Include="Ressources/exampleRecipe.xml" CopyToOutputDirectory="Always" />
     <Content Include="Ressources/simpleExampleRecipe.xml" CopyToOutputDirectory="Always" />
+    <Content Include="Ressources/testToSeeIfBeingRead.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
