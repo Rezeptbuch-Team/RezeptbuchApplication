@@ -1,3 +1,8 @@
+CREATE TABLE "app_info" (
+  "key"   TEXT PRIMARY KEY,
+  "value" TEXT NOT NULL
+);
+
 CREATE TABLE "recipes" (
   "hash" TEXT PRIMARY KEY,
   "is_download" INTEGER,
