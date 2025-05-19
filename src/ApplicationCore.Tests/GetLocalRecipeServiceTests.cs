@@ -21,11 +21,15 @@ public class GetLocalRecipeServiceTests
     {
         return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
     }
-    
+
+    IOnlineIdentificationService onlineIdentificationService;
     [SetUp]
     public void Setup()
     {
         StartupService.AppDataFolder();
+        Mock<IOnlineIdentificationService> mock = new();
+        mock.Setup(s => s.GetUUID()).ReturnsAsync("someUUID");
+        onlineIdentificationService = mock.Object;
     }
 
     [Test]
@@ -69,7 +73,7 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         // create the service and call the method
-        GetLocalRecipeService service = new(mockDatabaseService.Object);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
         Recipe resultRecipe = await service.GetRecipe(hash);
 
         // check that the queryAsync method was called
@@ -119,7 +123,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
 
         Assert.That(
             async () => await service.GetRecipe(hash),
@@ -174,7 +178,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
 
         Assert.DoesNotThrowAsync(async () => await service.GetRecipe(hash));
 
@@ -260,7 +264,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
 
         Recipe returnedRecipe = await service.GetRecipe(hash);
 
@@ -272,6 +276,7 @@ public class GetLocalRecipeServiceTests
             Assert.That(returnedRecipe.Description, Is.EqualTo(expectedRecipe.Description));
             Assert.That(returnedRecipe.Servings, Is.EqualTo(expectedRecipe.Servings));
             Assert.That(returnedRecipe.Categories, Is.EqualTo(expectedRecipe.Categories));
+            Assert.That(returnedRecipe.PublishOption, Is.EqualTo(PublishOption.PUBLISHED));
             for (int i = 0; i < returnedRecipe.Instructions.Count; i++)
             {
                 Assert.That(returnedRecipe.Instructions[i].Items, Is.EqualTo(expectedRecipe.Instructions[i].Items));

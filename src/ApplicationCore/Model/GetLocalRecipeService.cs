@@ -7,7 +7,7 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocalRecipeService
+public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIdentificationService onlineIdentificationService) : IGetLocalRecipeService
 {
     public async Task<Recipe> GetRecipe(string hash)
     {
@@ -21,6 +21,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
         };
         string filePath;
         PublishOption publishOption;
+        string? uuid = await onlineIdentificationService.GetUUID();
         await using (DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters))
         {
             if (await resultReader.ReadAsync())
@@ -32,7 +33,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService) : IGetLocal
                     bool is_published = resultReader.GetInt32(2) > 0;
                     bool is_modified = resultReader.GetInt32(3) > 0;
 
-                    if (is_download) publishOption = PublishOption.FORBIDDEN;
+                    if (is_download || uuid == null) publishOption = PublishOption.FORBIDDEN;
                     else if (!is_published) publishOption = PublishOption.NOT_PUBLISHED;
                     else if (is_published && is_modified) publishOption = PublishOption.OUTDATED;
                     else publishOption = PublishOption.PUBLISHED;
