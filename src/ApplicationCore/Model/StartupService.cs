@@ -1,4 +1,4 @@
-namespace ApplicationCore;
+namespace ApplicationCore.Model;
 
 public class StartupService
 {
