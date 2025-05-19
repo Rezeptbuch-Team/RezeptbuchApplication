@@ -21,6 +21,12 @@ public class GetLocalRecipeServiceTests
     {
         return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
     }
+    
+    [SetUp]
+    public void Setup()
+    {
+        StartupService.AppDataFolder();
+    }
 
     [Test]
     public async Task WillCorrectlyRequestFromDatabase()

@@ -17,7 +17,7 @@ public class SqliteService : IDatabaseService {
     private readonly string _dbPath;
 
     public SqliteService(string? dbPath = null) {
-        string defaultDbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "database.sqlite");
+        string defaultDbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch", "database.sqlite");
         _dbPath = string.IsNullOrWhiteSpace(dbPath) ? defaultDbPath : dbPath;
         _connectionString = $"Data Source={_dbPath}";
     }

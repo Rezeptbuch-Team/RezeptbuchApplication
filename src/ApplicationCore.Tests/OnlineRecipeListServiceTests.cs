@@ -40,6 +40,8 @@ public class OnlineRecipeListServiceTests
     [SetUp]
     public void Setup()
     {
+        StartupService.AppDataFolder();
+
         HttpClient httpClient = new()
         {
             BaseAddress = new Uri("http://api.server.com/")

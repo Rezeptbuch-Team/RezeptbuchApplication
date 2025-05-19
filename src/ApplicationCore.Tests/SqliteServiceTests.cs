@@ -10,6 +10,12 @@ namespace ApplicationCore.Tests;
 // The solution is to use a different database file for each test.
 public class SqliteServiceTests
 {
+    [SetUp]
+    public void StandardSetup()
+    {
+        StartupService.AppDataFolder();
+    }
+
     private static SqliteService Setup(string dbPath)
     {
         if (File.Exists(dbPath))
