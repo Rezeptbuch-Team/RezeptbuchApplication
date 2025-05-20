@@ -11,7 +11,22 @@ public partial class ShowRecipeViewModel : ObservableObject
     {
         RecipeName = "Recipe Name";
         RecipeTime = 10;
-        RecipeIngredients = [new Ingredient("Ingredient1", 20), new Ingredient("Ingredient2", 10), new Ingredient("Ingredient3", 14)];
+        RecipeIngredients = [
+        new Ingredient() {
+            Name="Ingredient1",
+            Amount=500,
+            Unit="ml"
+        },
+        new Ingredient() {
+            Name="Ingredient2",
+            Amount=200,
+            Unit="g"
+        },
+        new Ingredient() {
+            Name="Ingredient3",
+            Amount=60,
+            Unit="g"
+        }];
         RecipeDescription = "Recipe Description";
         RecipeImage = "dotnet_bot.png";
     }

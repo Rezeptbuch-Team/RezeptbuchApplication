@@ -43,7 +43,7 @@
                                             Text="{Binding Name}"/>
                                         <Label
                                             Grid.Column="1"
-                                            Text="{Binding Quantity}"/>
+                                            Text="{Binding Amount}"/>
                                     </Grid>
                                 </ViewCell>
                             </DataTemplate>
