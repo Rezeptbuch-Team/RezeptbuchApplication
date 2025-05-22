@@ -6,9 +6,11 @@ public class Ingredient
     public required int Amount { get; set; }
     public required string Unit { get; set; }
 
-    public override bool Equals(object obj) =>
+    public override bool Equals(object? obj) =>
         obj is Ingredient i &&
         Name == i.Name && Amount == i.Amount && Unit == i.Unit;
+
+    public override int GetHashCode() =>  HashCode.Combine(Name, Amount, Unit);
 
     public override string ToString()
     {
@@ -90,10 +92,8 @@ public class Recipe
 
     public class IngredientNameUnitComparer : IEqualityComparer<Ingredient>
     {
-        public bool Equals(Ingredient x, Ingredient y)
-        {
-            return x.Name == y.Name && x.Unit == y.Unit;
-        }
+        public bool Equals(Ingredient? x, Ingredient? y)
+            => x != null && y != null && x.Name == y.Name && x.Unit == y.Unit;
 
         public int GetHashCode(Ingredient obj)
         {

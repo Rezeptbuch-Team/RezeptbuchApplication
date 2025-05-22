@@ -1,6 +1,5 @@
 using System.Data;
 using System.Data.Common;
-using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
 using Moq;
