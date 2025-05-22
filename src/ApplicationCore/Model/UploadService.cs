@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Text;
+using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
@@ -55,11 +56,15 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
         return (uuid, File.ReadAllText(Path.Combine(appDataPath, filePath)));
     }
 
-    public async Task UploadRecipe(string hash)
+    public async Task UploadRecipe(string hash, UploadType uploadType)
     {
         (string uuid, string xmlContent) = await GetXmlFile(hash);
 
-        HttpRequestMessage request = new(HttpMethod.Post, "recipes")
+        HttpMethod httpMethod = uploadType == UploadType.UPLOAD ? HttpMethod.Post : HttpMethod.Put;
+        string url = "recipes";
+        if (httpMethod == HttpMethod.Put) url += $"/{hash}";
+
+        HttpRequestMessage request = new(httpMethod, url)
         {
             Content = new StringContent(xmlContent, Encoding.UTF8, "application/xml")
         };

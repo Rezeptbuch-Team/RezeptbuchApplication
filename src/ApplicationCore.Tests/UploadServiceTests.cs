@@ -2,6 +2,7 @@ using System.Net;
 using System.Data;
 using System.Data.Common;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Common.Types;
 using ApplicationCore.Model;
 using Moq;
 using Moq.Protected;
@@ -25,7 +26,8 @@ public class UploadTests
     string hash = "123asd";
 
     [SetUp]
-    public void Setup() {
+    public void Setup()
+    {
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         string filePath = "someFile.xml";
         string absoluteFilePath = Path.Combine(appDataPath, filePath);
@@ -88,6 +90,7 @@ public class UploadTests
             "SendAsync",
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.Method == HttpMethod.Post
+                && req.RequestUri == new Uri($"https://api.server.com/recipes")
             ),
             ItExpr.IsAny<CancellationToken>()
         )
@@ -114,7 +117,60 @@ public class UploadTests
 
 
         UploadService service = new(databaseService.Object, httpClient);
-        await service.UploadRecipe(hash);
+        await service.UploadRecipe(hash, UploadType.UPLOAD);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedUuid, Is.EqualTo("someUUID"));
+            Assert.That(capturedXml, Is.EqualTo("testcontent"));
+        });
+    }
+
+    /// <summary>
+    /// check that updating a recipe works by just changing the httpmethod
+    /// </summary>
+    /// <returns></returns>
+    [Test]
+    public async Task UploadRecipe_PostsFileContentWithUUID_AndCorrectUrl_IfMethodIsPut()
+    {
+        string capturedXml = "";
+        string capturedUuid = "";
+
+        Mock<HttpMessageHandler> handlerMock = new();
+        handlerMock
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.Method == HttpMethod.Put
+                && req.RequestUri == new Uri($"https://api.server.com/recipes/{hash}")
+            ),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .Callback<HttpRequestMessage, CancellationToken>(async (req, _) =>
+        {
+            // Capture UUID header
+            if (req.Headers.TryGetValues("uuid", out var values))
+            {
+                capturedUuid = values.FirstOrDefault()!;
+            }
+
+            // Capture XML content
+            if (req.Content != null)
+            {
+                capturedXml = await req.Content.ReadAsStringAsync();
+            }
+        })
+        .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+        var httpClient = new HttpClient(handlerMock.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/")
+        };
+
+
+        UploadService service = new(databaseService.Object, httpClient);
+        await service.UploadRecipe(hash, UploadType.UPDATE);
 
         Assert.Multiple(() =>
         {
