@@ -9,16 +9,6 @@ namespace ApplicationCore.Tests;
 [TestFixture]
 public class OnlineIdentificationServiceTests
 {
-    /// <summary>
-    /// Remve extra whitespaces and new-lines from the SQL string
-    /// </summary>
-    /// <param name="sql"></param>
-    /// <returns></returns>
-    private static string NormalizeSql(string sql)
-    {
-        return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
-    }
-
     [Test]
     public async Task GetUUID_ShouldCorrectlyFormSql()
     {
@@ -36,7 +26,7 @@ public class OnlineIdentificationServiceTests
         #region mock database controller
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             It.IsAny<IDictionary<string, object>?>()
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -65,7 +55,7 @@ public class OnlineIdentificationServiceTests
         #region mock database controller
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             It.IsAny<IDictionary<string, object>?>()
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -96,7 +86,7 @@ public class OnlineIdentificationServiceTests
         #region mock database controller
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             It.IsAny<IDictionary<string, object>?>()
         )).ReturnsAsync(fakeReader).Verifiable();
         #endregion
@@ -156,7 +146,7 @@ public class OnlineIdentificationServiceTests
             It.IsAny<IDictionary<string, object>?>()
         )).ReturnsAsync(fakeReader).Verifiable();
         mockDatabaseService.Setup(db => db.NonQueryAsync(
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedInsertSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedInsertSql)),
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$key") && p["$key"].Equals("uuid") &&
                 p.ContainsKey("$value")

@@ -4,7 +4,6 @@ using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
 using Moq;
-using NUnit.Framework.Constraints;
 using NUnit.Framework.Internal;
 
 namespace ApplicationCore.Tests;
@@ -12,16 +11,6 @@ namespace ApplicationCore.Tests;
 [TestFixture]
 public class GetLocalRecipeServiceTests
 {
-    /// <summary>
-    /// Remve extra whitespaces and new-lines from the SQL string
-    /// </summary>
-    /// <param name="sql"></param>
-    /// <returns></returns>
-    private static string NormalizeSql(string sql)
-    {
-        return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
-    }
-
     IOnlineIdentificationService onlineIdentificationService;
     [SetUp]
     public void Setup()
@@ -63,7 +52,7 @@ public class GetLocalRecipeServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$hash") && p["$hash"].Equals(hash)
@@ -114,7 +103,7 @@ public class GetLocalRecipeServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$hash") && p["$hash"].Equals(hash)
@@ -169,7 +158,7 @@ public class GetLocalRecipeServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$hash") && p["$hash"].Equals(hash)
@@ -255,7 +244,7 @@ public class GetLocalRecipeServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$hash") && p["$hash"].Equals(hash)

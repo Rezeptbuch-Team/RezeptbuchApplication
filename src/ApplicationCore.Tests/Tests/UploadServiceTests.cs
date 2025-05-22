@@ -12,16 +12,6 @@ namespace ApplicationCore.Tests;
 [TestFixture]
 public class UploadTests
 {
-    /// <summary>
-    /// Remve extra whitespaces and new-lines from the SQL string
-    /// </summary>
-    /// <param name="sql"></param>
-    /// <returns></returns>
-    private static string NormalizeSql(string sql)
-    {
-        return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
-    }
-
     Mock<IDatabaseService> databaseService;
     string hash = "123asd";
 
@@ -53,7 +43,7 @@ public class UploadTests
         databaseService = new();
         databaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$hash") && p["$hash"].Equals(hash)

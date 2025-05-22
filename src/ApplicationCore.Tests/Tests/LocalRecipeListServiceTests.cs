@@ -12,15 +12,6 @@ namespace ApplicationCore.Tests;
 [TestFixture]
 public class LocalRecipeListServiceTests
 {
-    /// <summary>
-    /// Remve extra whitespaces and new-lines from the SQL string
-    /// </summary>
-    /// <param name="sql"></param>
-    /// <returns></returns>
-    private static string NormalizeSql(string sql) {
-        return string.Join(" ", sql.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
-    }
-
     [Test]
     public async Task GetLocalRecipes_ShouldCorrectlyCreateSqlAndParameters()
     {
@@ -61,7 +52,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(filter.Count) &&
@@ -123,7 +114,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(filter.Count) &&
@@ -235,7 +226,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
@@ -281,7 +272,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
@@ -367,7 +358,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
@@ -413,7 +404,7 @@ public class LocalRecipeListServiceTests
         var mockDatabaseService = new Mock<IDatabaseService>();
         mockDatabaseService.Setup(db => db.QueryAsync(
             // check that the SQL query is correct
-            It.Is<string>(s => NormalizeSql(s) == NormalizeSql(expectedSql)),
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
             // check that the parameters are correct
             It.Is<IDictionary<string, object>>(p =>
                 p.ContainsKey("$limit") && p["$limit"].Equals(limit) &&
