@@ -9,9 +9,9 @@ namespace ApplicationCore.Model;
 
 public class UploadService(IDatabaseService databaseService, HttpClient httpClient)
 {
-    public async Task<(string uuid, string? imagePath, string xmlContent)> GetXmlFile(string hash)
+    public async Task<(string uuid, string? imagePath, string last_published_hash, string xmlContent)> GetXmlFile(string hash)
     {
-        string sql = @"SELECT r.file_path, r.image_path, (
+        string sql = @"SELECT r.file_path, r.image_path, r.last_published_hash, (
                             SELECT value FROM app_info WHERE key = 'uuid'
                         ) AS uuid
                         FROM recipes r
@@ -23,6 +23,7 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
 
         string filePath = "";
         string? imagePath = "";
+        string? last_published_hash = "";
         string? uuid = "";
         await using (DbDataReader reader = await databaseService.QueryAsync(sql, parameters))
         {
@@ -32,7 +33,8 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
                 {
                     filePath = reader.GetString(0);
                     imagePath = reader.GetValue(1) as string;
-                    uuid = reader.GetValue(2) as string;
+                    last_published_hash = reader.GetValue(2) as string;
+                    uuid = reader.GetValue(3) as string;
 
                 }
                 catch (InvalidCastException)
@@ -53,11 +55,15 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
             {
                 throw new Exception("Online services not activated yet");
             }
+            else if (string.IsNullOrWhiteSpace(last_published_hash))
+            {
+                throw new Exception("Last published hash missing");
+            }
         }
 
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 
-        return (uuid, imagePath, File.ReadAllText(Path.Combine(appDataPath, filePath)));
+        return (uuid, imagePath, last_published_hash, File.ReadAllText(Path.Combine(appDataPath, filePath)));
     }
 
     public async Task UpdateRecipeInformation(string hash)
@@ -105,11 +111,11 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
 
     public async Task UploadRecipe(string hash, UploadType uploadType)
     {
-        (string uuid, string? imagePath, string xmlContent) = await GetXmlFile(hash);
+        (string uuid, string? imagePath, string last_published_hash, string xmlContent) = await GetXmlFile(hash);
 
         HttpMethod httpMethod = uploadType == UploadType.UPLOAD ? HttpMethod.Post : HttpMethod.Put;
         string url = "recipes";
-        if (httpMethod == HttpMethod.Put) url += $"/{hash}";
+        if (httpMethod == HttpMethod.Put) url += $"/{last_published_hash}";
 
         HttpRequestMessage request = new(httpMethod, url)
         {

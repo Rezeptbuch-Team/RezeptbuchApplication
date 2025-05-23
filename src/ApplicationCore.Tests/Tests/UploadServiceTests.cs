@@ -14,6 +14,7 @@ public class UploadTests
 {
     Mock<IDatabaseService> databaseService;
     string hash = "123asd";
+    string old_hash = "yxcasd";
 
     [SetUp]
     public void Setup()
@@ -26,7 +27,7 @@ public class UploadTests
         File.Copy(exampleRecipePath, absoluteFilePath);
 
         #region database mock
-        string expectedSql = @"SELECT r.file_path, r.image_path, (
+        string expectedSql = @"SELECT r.file_path, r.image_path, r.last_published_hash, (
                                     SELECT value FROM app_info WHERE key = 'uuid'
                                 ) AS uuid
                                 FROM recipes r
@@ -35,8 +36,9 @@ public class UploadTests
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
         table.Columns.Add("image_path", typeof(string));
+        table.Columns.Add("last_published_hash", typeof(string));
         table.Columns.Add("uuid", typeof(string));
-        table.Rows.Add(exampleRecipePath, "someImagePath", "someUUID");
+        table.Rows.Add(exampleRecipePath, "someImagePath", old_hash, "someUUID");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -58,12 +60,14 @@ public class UploadTests
     public async Task GetXmlFile_CorrectlyGetsXmlFile()
     {
         UploadService service = new(databaseService.Object, new HttpClient());
-        (string returnedUuid, string imagePath, string returnedXml) = await service.GetXmlFile(hash);
+        (string returnedUuid, string? imagePath, string last_published_hash, string returnedXml) = await service.GetXmlFile(hash);
 
         Assert.Multiple(() =>
         {
             Assert.That(returnedXml, Is.EqualTo("testcontent"));
             Assert.That(returnedUuid, Is.EqualTo("someUUID"));
+            Assert.That(last_published_hash, Is.EqualTo(old_hash));
+            Assert.That(imagePath, Is.EqualTo("someImagePath"));
         });
         databaseService.Verify();
     }
@@ -134,7 +138,7 @@ public class UploadTests
             "SendAsync",
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.Method == HttpMethod.Put
-                && req.RequestUri == new Uri($"https://api.server.com/recipes/{hash}")
+                && req.RequestUri == new Uri($"https://api.server.com/recipes/{old_hash}")
             ),
             ItExpr.IsAny<CancellationToken>()
         )
