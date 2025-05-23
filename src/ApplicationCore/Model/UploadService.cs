@@ -56,6 +56,20 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
         return (uuid, File.ReadAllText(Path.Combine(appDataPath, filePath)));
     }
 
+    public async Task UpdateRecipeInformation(string hash)
+    {
+        string sql = @"UPDATE recipes
+                        SET is_modified = 1,
+                            is_published = 1,
+                            last_published_hash = $hash
+                        WHERE hash = $hash;";
+        Dictionary<string, object> parameters = new() {
+            { "$hash", hash }
+        };
+
+        await databaseService.NonQueryAsync(sql, parameters);
+    }
+
     public async Task UploadRecipe(string hash, UploadType uploadType)
     {
         (string uuid, string xmlContent) = await GetXmlFile(hash);
@@ -82,5 +96,7 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
             throw new Exception("API unreachable");
         }
         #endregion
+
+        await UpdateRecipeInformation(hash);
     }
 }

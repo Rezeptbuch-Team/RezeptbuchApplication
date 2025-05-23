@@ -168,4 +168,32 @@ public class UploadTests
             Assert.That(capturedXml, Is.EqualTo("testcontent"));
         });
     }
+
+    [Test]
+    public async Task UpdateRecipeInformation_ShouldExecuteTheCorrectSql()
+    {
+        #region Arrange
+        string expectedSql = @"UPDATE recipes 
+                                SET is_modified = 1, is_published = 1, last_published_hash = $hash
+                                WHERE hash = $hash;";
+
+        var mockDatabaseService = new Mock<IDatabaseService>();
+        mockDatabaseService.Setup(db => db.NonQueryAsync(
+            // check that the SQL query is correct
+            It.Is<string>(s => SqlHelper.NormalizeSql(s) == SqlHelper.NormalizeSql(expectedSql)),
+            // check that the parameters are correct
+            It.Is<IDictionary<string, object>>(p =>
+               p.ContainsKey("$hash") && p["$hash"].Equals(hash)
+            )
+        )).ReturnsAsync(1).Verifiable();
+
+        // not used in this test
+        HttpClient httpClient = new();
+        #endregion
+
+        UploadService service = new(mockDatabaseService.Object, httpClient);
+        await service.UpdateRecipeInformation(hash);
+
+        mockDatabaseService.Verify();
+    }
 }
