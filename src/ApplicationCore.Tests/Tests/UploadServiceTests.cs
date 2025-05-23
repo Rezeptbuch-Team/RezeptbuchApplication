@@ -26,7 +26,7 @@ public class UploadTests
         File.Copy(exampleRecipePath, absoluteFilePath);
 
         #region database mock
-        string expectedSql = @"SELECT r.file_path, (
+        string expectedSql = @"SELECT r.file_path, r.image_path, (
                                     SELECT value FROM app_info WHERE key = 'uuid'
                                 ) AS uuid
                                 FROM recipes r
@@ -34,8 +34,9 @@ public class UploadTests
         #region create a fake DataTable to simulate the database response
         DataTable table = new();
         table.Columns.Add("file_path", typeof(string));
+        table.Columns.Add("image_path", typeof(string));
         table.Columns.Add("uuid", typeof(string));
-        table.Rows.Add(exampleRecipePath, "someUUID");
+        table.Rows.Add(exampleRecipePath, "someImagePath", "someUUID");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -57,7 +58,7 @@ public class UploadTests
     public async Task GetXmlFile_CorrectlyGetsXmlFile()
     {
         UploadService service = new(databaseService.Object, new HttpClient());
-        (string returnedUuid, string returnedXml) = await service.GetXmlFile(hash);
+        (string returnedUuid, string imagePath, string returnedXml) = await service.GetXmlFile(hash);
 
         Assert.Multiple(() =>
         {
@@ -80,7 +81,7 @@ public class UploadTests
             "SendAsync",
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.Method == HttpMethod.Post
-                && req.RequestUri == new Uri($"https://api.server.com/recipes")
+                && req.RequestUri == new Uri("https://api.server.com/recipes")
             ),
             ItExpr.IsAny<CancellationToken>()
         )
@@ -195,5 +196,105 @@ public class UploadTests
         await service.UpdateRecipeInformation(hash);
 
         mockDatabaseService.Verify();
+    }
+
+    [Test]
+    public async Task UploadImage_PostsImageWithUUID()
+    {
+        string exampleImagePath = Path.Combine(AppContext.BaseDirectory, "Ressources", "test.png");
+        byte[] capturedBytes = [];
+        string capturedUuid = "";
+
+        Mock<HttpMessageHandler> handlerMock = new();
+        handlerMock
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.Method == HttpMethod.Post
+                && req.RequestUri == new Uri($"https://api.server.com/images/{hash}")
+            ),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .Callback<HttpRequestMessage, CancellationToken>(async (req, _) =>
+        {
+            // Capture UUID header
+            if (req.Headers.TryGetValues("uuid", out var values))
+            {
+                capturedUuid = values.FirstOrDefault()!;
+            }
+
+            // Capture XML content
+            if (req.Content != null)
+            {
+                capturedBytes = await req.Content.ReadAsByteArrayAsync();
+            }
+        })
+        .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+        var httpClient = new HttpClient(handlerMock.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/")
+        };
+
+
+        UploadService service = new(databaseService.Object, httpClient);
+        await service.UploadImage(hash, exampleImagePath, "someUUID", HttpMethod.Post);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedUuid, Is.EqualTo("someUUID"));
+            Assert.That(capturedBytes, Is.EqualTo(File.ReadAllBytes(exampleImagePath)));
+        });
+    }
+
+    [Test]
+    public async Task UploadImage_PutsImageWithUUID()
+    {
+        string exampleImagePath = Path.Combine(AppContext.BaseDirectory, "Ressources", "test.png");
+        byte[] capturedBytes = [];
+        string capturedUuid = "";
+
+        Mock<HttpMessageHandler> handlerMock = new();
+        handlerMock
+        .Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.Method == HttpMethod.Put
+                && req.RequestUri == new Uri($"https://api.server.com/images/{hash}")
+            ),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .Callback<HttpRequestMessage, CancellationToken>(async (req, _) =>
+        {
+            // Capture UUID header
+            if (req.Headers.TryGetValues("uuid", out var values))
+            {
+                capturedUuid = values.FirstOrDefault()!;
+            }
+
+            // Capture XML content
+            if (req.Content != null)
+            {
+                capturedBytes = await req.Content.ReadAsByteArrayAsync();
+            }
+        })
+        .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+        var httpClient = new HttpClient(handlerMock.Object)
+        {
+            BaseAddress = new Uri("https://api.server.com/")
+        };
+
+
+        UploadService service = new(databaseService.Object, httpClient);
+        await service.UploadImage(hash, exampleImagePath, "someUUID", HttpMethod.Put);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedUuid, Is.EqualTo("someUUID"));
+            Assert.That(capturedBytes, Is.EqualTo(File.ReadAllBytes(exampleImagePath)));
+        });
     }
 }
