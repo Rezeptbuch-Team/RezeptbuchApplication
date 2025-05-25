@@ -15,7 +15,7 @@ public class GetLocalRecipeServiceTests
     [SetUp]
     public void Setup()
     {
-        StartupService.AppDataFolder();
+        StartupService.CreateAppDataFolder();
         Mock<IOnlineIdentificationService> mock = new();
         mock.Setup(s => s.GetUUID()).ReturnsAsync("someUUID");
         onlineIdentificationService = mock.Object;

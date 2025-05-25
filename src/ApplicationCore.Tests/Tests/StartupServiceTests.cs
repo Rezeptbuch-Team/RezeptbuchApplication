@@ -12,7 +12,7 @@ public class StartupServiceTests
 
         if (Directory.Exists(dirPath)) Directory.Delete(dirPath, recursive: true);
 
-        StartupService.AppDataFolder();
+        StartupService.CreateAppDataFolder();
 
         Assert.That(Directory.Exists(dirPath), Is.True);
     }

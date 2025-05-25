@@ -40,7 +40,7 @@ public class OnlineRecipeListServiceTests
     [SetUp]
     public void Setup()
     {
-        StartupService.AppDataFolder();
+        StartupService.CreateAppDataFolder();
 
         HttpClient httpClient = new()
         {
