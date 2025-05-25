@@ -1,8 +1,7 @@
 using System.Data.Common;
-using System.Security.Cryptography;
 using ApplicationCore.Model;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 // The Setup() method is used because the [NonParallelizable] attribute does not work correctly.

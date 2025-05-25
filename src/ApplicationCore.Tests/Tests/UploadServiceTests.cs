@@ -7,7 +7,7 @@ using ApplicationCore.Model;
 using Moq;
 using Moq.Protected;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 public class UploadTests

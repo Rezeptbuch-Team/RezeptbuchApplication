@@ -6,7 +6,7 @@ using NUnit.Framework.Internal;
 using System.Data.Common;
 using System.Data;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 
 [TestFixture]
