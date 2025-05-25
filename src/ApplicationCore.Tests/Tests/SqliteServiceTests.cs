@@ -13,7 +13,7 @@ public class SqliteServiceTests
     [SetUp]
     public void StandardSetup()
     {
-        StartupService.AppDataFolder();
+        StartupService.CreateAppDataFolder();
     }
 
     private static SqliteService Setup(string dbPath)
