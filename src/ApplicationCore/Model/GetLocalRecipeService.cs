@@ -7,86 +7,8 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIdentificationService onlineIdentificationService) : IGetLocalRecipeService
+public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIdentificationService onlineIdentificationService, IGetRecipeFromFileService getRecipeFromFileService) : IGetLocalRecipeService
 {
-    public async Task<Recipe> GetRecipeFromFile(string filePath)
-    {
-        #region check that recipe xml-file fits schema
-        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
-        filePath = Path.Combine(appDataPath, filePath);
-
-        string xsdPath = Path.Combine(AppContext.BaseDirectory, "Schemata", "recipeXml.xsd");
-        using (FileStream stream = File.OpenRead(xsdPath))
-        {
-            XmlReaderSettings settings = new()
-            {
-                Async = true,
-                ValidationType = ValidationType.Schema
-            };
-            settings.Schemas.Add(null, xsdPath);
-            settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
-
-            using (XmlReader reader = XmlReader.Create(filePath, settings))
-            {
-                while (await reader.ReadAsync())
-                {
-                    // Just go through the document
-                }
-            }
-        }
-        #endregion
-
-        #region deserialize recipe xml
-        XDocument doc = XDocument.Parse(await File.ReadAllTextAsync(filePath));
-        // because the xml has been validated there is no need to check for null values
-        XElement root = doc.Element("recipe")!;
-        Recipe recipe = new()
-        {
-            Hash = (string)root.Element("hash")!,
-            Title = (string)root.Element("title")!,
-            ImagePath = (string)root.Element("imageName")!,
-            Description = (string)root.Element("description")!,
-            Servings = (int)root.Element("servings")!,
-            CookingTime = (int)root.Element("cookingTime")!,
-            Categories = root.Element("categories")!
-                              .Elements("category")
-                              .Select(content => (string)content)
-                              .ToList()
-        };
-        #region extract instructions and ingredients from xml
-        foreach (XElement instructionElement in root.Element("instructions")!.Elements())
-        {
-            List<object> instructionItems = [];
-            foreach (XNode node in instructionElement.Nodes())
-            {
-                switch (node)
-                {
-                    case XText textNode:
-                        if (!string.IsNullOrWhiteSpace(textNode.Value))
-                        {
-                            instructionItems.Add(string.Join(" ", textNode.Value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries)));
-                        }
-                        break;
-                    case XElement elemNode when elemNode.Name == "ingredient":
-                        instructionItems.Add(new Ingredient
-                        {
-                            Name = (string)elemNode.Attribute("name")!,
-                            Amount = (int)elemNode.Attribute("amount")!,
-                            Unit = (string)elemNode.Attribute("unit")!
-                        });
-                        break;
-                }
-            }
-            recipe.Instructions.Add(new Instruction
-            {
-                Items = instructionItems
-            });
-        }
-        #endregion
-        #endregion
-
-        return recipe;
-    }
 
     public async Task<Recipe> GetRecipe(string hash)
     {
@@ -133,14 +55,9 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
         }
         #endregion
 
-        Recipe recipe = await GetRecipeFromFile(filePath);
+        Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
         recipe.PublishOption = publishOption;
 
         return recipe;
-    }
-    
-    static void ValidationCallback(object? sender, ValidationEventArgs? args)
-    {
-        throw new Exception("Recipe XML-file does not fit schema");
     }
 }

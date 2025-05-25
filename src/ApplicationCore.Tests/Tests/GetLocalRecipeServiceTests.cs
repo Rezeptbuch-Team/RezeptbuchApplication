@@ -62,7 +62,7 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         // create the service and call the method
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
         Recipe resultRecipe = await service.GetRecipe(hash);
 
         // check that the queryAsync method was called
@@ -112,7 +112,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
 
         Assert.That(
             async () => await service.GetRecipe(hash),
@@ -167,7 +167,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
 
         Assert.DoesNotThrowAsync(async () => await service.GetRecipe(hash));
 
@@ -253,7 +253,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService);
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
 
         Recipe returnedRecipe = await service.GetRecipe(hash);
 
