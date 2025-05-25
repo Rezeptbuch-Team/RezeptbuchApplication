@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace ApplicationCore.Common.Types;
 
 public class Ingredient
@@ -130,7 +133,18 @@ public class Recipe
             }
             scaledInstructions.Add(newInstruction);
         }
-        
+
         return scaledInstructions;
+    }
+
+    public string CalculateHash()
+    {
+        string inputString = Title + ImagePath + Description + Servings.ToString() + CookingTime.ToString() + string.Join("", Categories) + string.Join("", Instructions);
+        byte[] inputBytes = Encoding.UTF8.GetBytes(inputString);
+        byte[] hashBytes = SHA256.HashData(inputBytes);
+        StringBuilder sb = new();
+        foreach (var b in hashBytes)
+            sb.Append(b.ToString("x2"));
+        return sb.ToString();
     }
 }
