@@ -93,7 +93,6 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         await databaseService.NonQueryAsync(sql, parameters);
     }
 
-
     private async Task<bool> IsHashInDatabase(string hash)
     {
         string sql = @"SELECT COUNT(*)
@@ -109,18 +108,22 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         }
     }
 
-    private async Task AddRecipeToDatabase(Recipe recipe)
+    private async Task AddRecipeToDatabase(Recipe recipe, string filePath)
     {
-        throw new NotImplementedException();
         string insertRecipeSql = @"INSERT INTO recipes
-                                    ";
+                                    VALUES ($hash, 0, 0, 0, NULL, $title, $description, $image_path, $cooking_time, $file_path);";
         string insertCategoriesSql = @"";
         string insertIngredientsSql = @"";
 
         string sql = insertRecipeSql + insertCategoriesSql + insertIngredientsSql;
         Dictionary<string, object> parameters = new()
         {
-
+            { "$hash", recipe.Hash },
+            { "$title", recipe.Title },
+            { "$description", recipe.Description },
+            { "$image_path", recipe.ImagePath },
+            { "$cooking_time", recipe.CookingTime },
+            { "$file_path", filePath }
         };
 
         await databaseService.NonQueryAsync(sql, parameters);
@@ -187,7 +190,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
                 Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
                 if (!await IsHashInDatabase(recipe.Hash))
                 {
-                    await AddRecipeToDatabase(recipe);
+                    await AddRecipeToDatabase(recipe, filePath);
                 }
             }
             catch
