@@ -36,7 +36,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
 {
     public string BuildListUrl(Filter filter)
     {
-        string url = "/list?";
+        string url = "/recipes?";
         url += "count=" + filter.Count.ToString() + "&";
         url += "offset=" + filter.Offset.ToString();
         if (filter.OrderBy == OrderBy.COOKINGTIME)

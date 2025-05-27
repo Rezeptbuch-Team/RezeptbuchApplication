@@ -98,7 +98,7 @@ public class OnlineRecipeListServiceTests
 
         string url = onlineRecipeListService.BuildListUrl(filter);
 
-        Assert.That(url, Does.StartWith("/list?"));
+        Assert.That(url, Does.StartWith("/recipes?"));
     }
 
     [Test]
