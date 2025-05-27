@@ -1,10 +1,7 @@
-using System.ComponentModel;
 using System.Data.Common;
-using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
-using SQLitePCL;
 
 namespace ApplicationCore.Model;
 
@@ -41,7 +38,8 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         await databaseService.NonQueryAsync(sql, parameters);
     }
 
-    private async Task CheckForConflictInFile(string filePath, string databaseHash) {
+    private async Task CheckForConflictInFile(string filePath, string databaseHash)
+    {
         try
         {
             Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
@@ -118,6 +116,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
 
     private async Task AddRecipeToDatabase(Recipe recipe, string filePath)
     {
+        #region insert recipe
         Dictionary<string, object> insertRecipeParameters = new()
         {
             { "$hash", recipe.Hash },
@@ -130,6 +129,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         string insertRecipeSql = @"INSERT INTO recipes
                                     VALUES ($hash, 0, 0, 0, NULL, $title, $description, $image_path, $cooking_time, $file_path);";
         await databaseService.NonQueryAsync(insertRecipeSql, insertRecipeParameters);
+        #endregion
 
         #region insert categories
         foreach (string categoryName in recipe.Categories)
@@ -198,7 +198,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         #endregion
     }
     #endregion
-    
+
     public static void CreateAppDataFolder()
     {
         string dirPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
