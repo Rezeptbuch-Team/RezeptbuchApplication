@@ -4,7 +4,7 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
 using Moq;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 public class OnlineIdentificationServiceTests

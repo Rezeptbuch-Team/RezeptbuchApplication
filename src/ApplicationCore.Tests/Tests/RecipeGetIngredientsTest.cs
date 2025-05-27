@@ -1,6 +1,6 @@
 using ApplicationCore.Common.Types;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 /// <summary>
 /// a recipe should return a list of ingredients with their respective amount

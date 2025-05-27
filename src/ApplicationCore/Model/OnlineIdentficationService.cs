@@ -9,7 +9,6 @@ public class OnlineIdentificationService(IDatabaseService databaseService) : IOn
     /// Get the UUID from the database
     /// </summary>
     /// <returns>UUID</returns>
-    /// <exception cref="NotImplementedException"></exception>
     public async Task<string?> GetUUID()
     {
         string sql = "SELECT value FROM app_info WHERE key = 'uuid';";
@@ -30,7 +29,6 @@ public class OnlineIdentificationService(IDatabaseService databaseService) : IOn
     /// If there is no UUID yet one gets created
     /// </summary>
     /// <returns>UUID</returns>
-    /// <exception cref="NotImplementedException"></exception>
     public async Task<string> CreateUUID()
     {
         string? uuid = await GetUUID();

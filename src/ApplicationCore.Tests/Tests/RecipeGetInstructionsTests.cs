@@ -1,6 +1,6 @@
 using ApplicationCore.Common.Types;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 public class RecipeGetInstructionsTests
@@ -25,8 +25,10 @@ public class RecipeGetInstructionsTests
 
     public class InstructionComparer : IEqualityComparer<Instruction>
     {
-        public bool Equals(Instruction x, Instruction y)
+        public bool Equals(Instruction? x, Instruction? y)
         {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
             if (x.Items.Count != y.Items.Count) return false;
 
             for (int i = 0; i < x.Items.Count; i++)

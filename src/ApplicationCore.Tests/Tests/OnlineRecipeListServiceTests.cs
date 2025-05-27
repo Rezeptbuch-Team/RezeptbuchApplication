@@ -5,7 +5,7 @@ using Moq.Protected;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 public class OnlineRecipeListServiceTests

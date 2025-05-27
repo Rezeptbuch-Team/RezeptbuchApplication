@@ -11,8 +11,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
 
-    <Content Include="Schemata/database.sql" CopyToOutputDirectory="Always" />
-    <Content Include="Schemata/recipeXml.xsd" CopyToOutputDirectory="Always" />
+    <EmbeddedResource Include="Schemata\database.sql">
+      <LogicalName>ApplicationCore.Schemata.database.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Schemata\recipeXml.xsd">
+      <LogicalName>ApplicationCore.Schemata.recipeXml.xsd</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
