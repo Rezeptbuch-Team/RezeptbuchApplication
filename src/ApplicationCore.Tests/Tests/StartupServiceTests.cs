@@ -1,6 +1,6 @@
 using ApplicationCore.Model;
 
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Tests;
 
 [TestFixture]
 public class StartupServiceTests

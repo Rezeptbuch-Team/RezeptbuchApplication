@@ -1,4 +1,3 @@
-using System.Configuration.Assemblies;
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Text;
