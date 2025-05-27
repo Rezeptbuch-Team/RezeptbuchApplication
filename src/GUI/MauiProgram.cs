@@ -26,6 +26,8 @@ public static class MauiProgram
 		builder.Services.AddHttpClient<IOnlineRecipeListService, OnlineRecipeListService>(client => {
 			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
+
+		StartupService.CreateAppDataFolder();
 		
 		builder.Services.AddSingleton<IDatabaseService>(sp =>
 		{
