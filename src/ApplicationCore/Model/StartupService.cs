@@ -15,6 +15,12 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
     {
         string sql = @"UPDATE recipes
                         SET hash = $new_hash, is_modified = 1
+                        WHERE hash = $old_hash;
+                        UPDATE recipe_category
+                        SET hash = $new_hash
+                        WHERE hash = $old_hash;
+                        UPDATE recipe_ingredient
+                        SET hash = $new_hash
                         WHERE hash = $old_hash;";
         Dictionary<string, object> parameters = new(){
             { "$new_hash", updatedHash },
