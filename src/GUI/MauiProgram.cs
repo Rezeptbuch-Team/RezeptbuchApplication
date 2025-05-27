@@ -24,10 +24,16 @@ public static class MauiProgram
 
 		// needed for application core http clients
 		builder.Services.AddHttpClient<IOnlineRecipeListService, OnlineRecipeListService>(client => {
-			client.BaseAddress = new Uri("http://localhost:2222/list/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
+			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
-
-		builder.Services.AddSingleton<IDatabaseService, SqliteService>();
+		
+		builder.Services.AddSingleton<IDatabaseService>(sp =>
+		{
+			IDatabaseService databaseService = new SqliteService();
+			databaseService.InitializeAsync().Wait();
+			return databaseService;
+		});
+		
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
 
 		// add Views and ViewModels

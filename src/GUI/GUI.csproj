@@ -67,7 +67,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ApplicationCore\ApplicationCore.csproj" />
+	  	<ProjectReference Include="..\ApplicationCore\ApplicationCore.csproj" />
+		<Content Include="../ApplicationCore/Schemata/database.sql" CopyToOutputDirectory="Always" />
+		<Content Include="../ApplicationCore/Schemata/recipeXml.xsd" CopyToOutputDirectory="Always" />
 	</ItemGroup>
 
 </Project>

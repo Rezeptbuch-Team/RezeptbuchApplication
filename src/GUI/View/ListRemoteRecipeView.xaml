@@ -8,7 +8,7 @@
              x:DataType="viewmodel:ListRemoteRecipeViewModel">
     <ContentPage.Content>
         <Grid
-            RowDefinitions="60, *"
+            RowDefinitions="60, Auto, *"
             RowSpacing="10">
             <Grid
                 Grid.Row="0"
@@ -21,13 +21,13 @@
                 <Button
                     Grid.Column="1"
                     Text="Select Filter"/>
-                <Button
+                <Picker
                     Grid.Column="2"
-                    Text="Sort By:"/>
+                    ItemsSource="{Binding OrderOptions}"
+                    SelectedItem="{Binding SelectedOrderOption}"/>
             </Grid>
-            
             <ListView
-                Grid.Row="1"
+                Grid.Row="2"
                 ItemsSource="{Binding RecipeEntries}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
