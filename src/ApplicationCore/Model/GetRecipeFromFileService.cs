@@ -14,23 +14,23 @@ public class GetRecipeFromFileService : IGetRecipeFromFileService
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         filePath = Path.Combine(appDataPath, filePath);
 
-        string xsdPath = Path.Combine(AppContext.BaseDirectory, "Schemata", "recipeXml.xsd");
-        using (FileStream stream = File.OpenRead(xsdPath))
-        {
-            XmlReaderSettings settings = new()
-            {
-                Async = true,
-                ValidationType = ValidationType.Schema
-            };
-            settings.Schemas.Add(null, xsdPath);
-            settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
+        var asm = typeof(SqliteService).Assembly;
+        using var xsdStream = asm.GetManifestResourceStream("ApplicationCore.Schemata.recipeXml.xsd");
+        using var xsdReader = XmlReader.Create(xsdStream!);
 
-            using (XmlReader reader = XmlReader.Create(filePath, settings))
+        XmlReaderSettings settings = new()
+        {
+            Async = true,
+            ValidationType = ValidationType.Schema
+        };
+        settings.Schemas.Add(null, xsdReader);
+        settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
+
+        using (XmlReader reader = XmlReader.Create(filePath, settings))
+        {
+            while (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    // Just go through the document
-                }
+                // Just go through the document
             }
         }
         #endregion

@@ -39,12 +39,18 @@ public class SqliteService : IDatabaseService {
         }
 
         #region Get schema
-        string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Schemata", "database.sql");
-        if (!File.Exists(schemaFilePath)) {
-            throw new FileNotFoundException("Schema file not found", schemaFilePath);
-        }
+        // string schemaFilePath = Path.Combine(AppContext.BaseDirectory, "Schemata", "database.sql");
+        // if (!File.Exists(schemaFilePath))
+        // {
+        //     throw new FileNotFoundException("Schema file not found", schemaFilePath);
+        // }
 
-        string schemaSql = await File.ReadAllTextAsync(schemaFilePath);
+        // string schemaSql = await File.ReadAllTextAsync(schemaFilePath);
+
+        var asm = typeof(SqliteService).Assembly;
+        using var stream = asm.GetManifestResourceStream("ApplicationCore.Schemata.database.sql");
+        using var reader = new StreamReader(stream!);
+        string schemaSql = reader.ReadToEnd();
         #endregion
         
         #region Create database
