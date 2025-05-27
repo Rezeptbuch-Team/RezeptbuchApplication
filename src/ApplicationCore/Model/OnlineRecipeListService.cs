@@ -101,7 +101,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         {
             foreach (RecipeEntry recipeEntry in recipesEntries)
             {
-                string imageUrl = "/images/" + recipeEntry.Hash + ".png";
+                string imageUrl = "/images/" + recipeEntry.Hash;
                 try
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
@@ -112,7 +112,9 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
                     }
                     else
                     {
-                        throw new Exception("Image download error. Status code: " + response.StatusCode);
+                        // throw new Exception("Image download error. Status code: " + response.StatusCode);
+                        // it is okay if there is no image
+                        recipeEntry.ImagePath = "";
                     }
                 }
                 catch (HttpRequestException)
