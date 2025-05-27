@@ -1,7 +1,4 @@
 using System.Data.Common;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Schema;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 

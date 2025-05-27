@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using System.Data.Common;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
+using SQLitePCL;
 
 namespace ApplicationCore.Model;
 
@@ -110,13 +112,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
 
     private async Task AddRecipeToDatabase(Recipe recipe, string filePath)
     {
-        string insertRecipeSql = @"INSERT INTO recipes
-                                    VALUES ($hash, 0, 0, 0, NULL, $title, $description, $image_path, $cooking_time, $file_path);";
-        string insertCategoriesSql = @"";
-        string insertIngredientsSql = @"";
-
-        string sql = insertRecipeSql + insertCategoriesSql + insertIngredientsSql;
-        Dictionary<string, object> parameters = new()
+        Dictionary<string, object> insertRecipeParameters = new()
         {
             { "$hash", recipe.Hash },
             { "$title", recipe.Title },
@@ -125,8 +121,75 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
             { "$cooking_time", recipe.CookingTime },
             { "$file_path", filePath }
         };
+        string insertRecipeSql = @"INSERT INTO recipes
+                                    VALUES ($hash, 0, 0, 0, NULL, $title, $description, $image_path, $cooking_time, $file_path);";
+        await databaseService.NonQueryAsync(insertRecipeSql, insertRecipeParameters);
 
-        await databaseService.NonQueryAsync(sql, parameters);
+        #region insert categories
+        foreach (string categoryName in recipe.Categories)
+        {
+            Dictionary<string, object> parameters = new()
+            {
+                { "$name", categoryName }
+            };
+            string insertCategorySql = @"INSERT OR IGNORE INTO categories(name)
+                                            VALUES($name);";
+            await databaseService.NonQueryAsync(insertCategorySql, parameters);
+            string getCategoryIdSql = @"SELECT id FROM categories
+                                        WHERE name = $name;";
+            await using (DbDataReader reader = await databaseService.QueryAsync(getCategoryIdSql, parameters))
+            {
+                if (await reader.ReadAsync())
+                {
+                    int? categoryId = reader.GetValue(0) as int?;
+                    if (categoryId != null)
+                    {
+                        string insertRecipeCategorySql = @"INSERT OR IGNORE INTO recipe_category(hash, category_id)
+                                                            VALUES ($hash, $catId);";
+                        Dictionary<string, object> insertRecipeCategoryParameters = new()
+                        {
+                            { "$hash", recipe.Hash },
+                            { "$catId", categoryId }
+                        };
+                        await databaseService.NonQueryAsync(insertRecipeCategorySql, insertRecipeCategoryParameters);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region insert ingredients
+        foreach (Ingredient ingredient in recipe.GetIngredients())
+        {
+            Dictionary<string, object> parameters = new()
+            {
+                { "$name", ingredient.Name }
+            };
+            string insertIngredientSql = @"INSERT OR IGNORE INTO ingredients(name)
+                                            VALUES($name);";
+            await databaseService.NonQueryAsync(insertIngredientSql, parameters);
+            string getIngredientIdSql = @"SELECT id FROM ingredients
+                                        WHERE name = $name;";
+            await using (DbDataReader reader = await databaseService.QueryAsync(getIngredientIdSql, parameters))
+            {
+                if (await reader.ReadAsync())
+                {
+                    int? ingId = reader.GetValue(0) as int?;
+                    if (ingId != null)
+                    {
+                        string insertRecipeIngredientSql = @"INSERT OR IGNORE INTO recipe_ingredient(hash, ingredient_id)
+                                                            VALUES ($hash, $ingId);";
+                        Dictionary<string, object> insertRecipeIngredientParameters = new()
+                        {
+                            { "$hash", recipe.Hash },
+                            { "$ingId", ingId }
+                        };
+                        await databaseService.NonQueryAsync(insertRecipeIngredientSql, insertRecipeIngredientParameters);
+                    }
+                }
+            }
+        }
+        #endregion
     }
     #endregion
     
