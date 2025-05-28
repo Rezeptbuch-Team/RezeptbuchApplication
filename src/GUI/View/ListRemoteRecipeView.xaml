@@ -42,9 +42,9 @@
                             x:DataType="types:RecipeEntry">
                             <Grid
                                 ColumnDefinitions="150, 250, *">
-                                <Label
+                                <Image
                                     Grid.Column="0"
-                                    Text="{Binding Path=Hash}"/>
+                                    Source="{Binding Path=ImagePath}"/>
                                 <Label
                                     Grid.Column="1"
                                     Text="{Binding Path=Title}"/>
