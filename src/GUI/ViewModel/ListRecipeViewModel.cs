@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GUI.ViewModel;
 
@@ -21,9 +23,9 @@ public partial class ListRecipeViewModel : ObservableObject
     private List<string>? _availableFilterOptions;
     
     [ObservableProperty] 
-    private List<string>? _selectedFilters;
+    private ObservableCollection<string>? _selectedFilters = [];
     
-    private Filter CurrentFilter => new Filter((OrderBy)Enum.Parse(typeof(OrderBy), SelectedOrderOption), Order.ASCENDING, SelectedFilters, null, 10, 0);
+    private Filter CurrentFilter => new Filter((OrderBy)Enum.Parse(typeof(OrderBy), SelectedOrderOption), Order.ASCENDING, SelectedFilters?.ToList(), null, 10, 0);
     
     protected ListRecipeViewModel(IRecipeListService recipeListService)
     {
@@ -31,11 +33,10 @@ public partial class ListRecipeViewModel : ObservableObject
         RecipeEntries = [];
         OrderOptions= Enum.GetNames(typeof(OrderBy)).ToList();
         SelectedOrderOption = OrderOptions.First();
-        //AvailableFilterOptions get from _recipeListService
         _ = RefreshRecipes();
     }
 
-    
+    [RelayCommand]
     private async Task RefreshRecipes()
     {
         try
