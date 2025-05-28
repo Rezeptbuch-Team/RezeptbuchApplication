@@ -56,8 +56,8 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.83" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.83" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="UraniumUI" Version="2.12.1" />
 		<PackageReference Include="UraniumUI.Material" Version="2.12.1" />
