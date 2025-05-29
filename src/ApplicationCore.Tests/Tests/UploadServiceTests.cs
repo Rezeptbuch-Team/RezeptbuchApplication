@@ -4,6 +4,7 @@ using System.Data.Common;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 using Moq;
 using Moq.Protected;
 
@@ -59,7 +60,7 @@ public class UploadTests
     [Test]
     public async Task GetXmlFile_CorrectlyGetsXmlFile()
     {
-        UploadService service = new(databaseService.Object, new HttpClient());
+        UploadService service = new(databaseService.Object, new HttpClient(), FileHelper.GetAppDataPath());
         (string returnedUuid, string? imagePath, string last_published_hash, string returnedXml) = await service.GetXmlFile(hash);
 
         Assert.Multiple(() =>
@@ -111,7 +112,7 @@ public class UploadTests
         };
 
 
-        UploadService service = new(databaseService.Object, httpClient);
+        UploadService service = new(databaseService.Object, httpClient, FileHelper.GetAppDataPath());
         await service.UploadRecipe(hash, UploadType.UPLOAD);
 
         Assert.Multiple(() =>
@@ -164,7 +165,7 @@ public class UploadTests
         };
 
 
-        UploadService service = new(databaseService.Object, httpClient);
+        UploadService service = new(databaseService.Object, httpClient, FileHelper.GetAppDataPath());
         await service.UploadRecipe(hash, UploadType.UPDATE);
 
         Assert.Multiple(() =>
@@ -196,7 +197,7 @@ public class UploadTests
         HttpClient httpClient = new();
         #endregion
 
-        UploadService service = new(mockDatabaseService.Object, httpClient);
+        UploadService service = new(mockDatabaseService.Object, httpClient, FileHelper.GetAppDataPath());
         await service.UpdateRecipeInformation(hash);
 
         mockDatabaseService.Verify();
@@ -242,7 +243,7 @@ public class UploadTests
         };
 
 
-        UploadService service = new(databaseService.Object, httpClient);
+        UploadService service = new(databaseService.Object, httpClient, FileHelper.GetAppDataPath());
         await service.UploadImage(hash, exampleImagePath, "someUUID", HttpMethod.Post);
 
         Assert.Multiple(() =>
@@ -292,7 +293,7 @@ public class UploadTests
         };
 
 
-        UploadService service = new(databaseService.Object, httpClient);
+        UploadService service = new(databaseService.Object, httpClient, FileHelper.GetAppDataPath());
         await service.UploadImage(hash, exampleImagePath, "someUUID", HttpMethod.Put);
 
         Assert.Multiple(() =>

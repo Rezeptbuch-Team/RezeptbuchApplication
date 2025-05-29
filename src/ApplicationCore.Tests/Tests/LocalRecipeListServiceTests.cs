@@ -1,6 +1,7 @@
 using ApplicationCore.Common.Types;
 using ApplicationCore.Model;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Tests.Helpers;
 using Moq;
 using NUnit.Framework.Internal;
 using System.Data.Common;

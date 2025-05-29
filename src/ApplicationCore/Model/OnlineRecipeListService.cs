@@ -32,7 +32,7 @@ public class JsonCategories
     public required List<string> Categories { get; set; }
 }
 
-public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListService
+public class OnlineRecipeListService(HttpClient httpClient, string appDataPath) : IOnlineRecipeListService
 {
     public string BuildListUrl(Filter filter)
     {
@@ -78,7 +78,6 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
 
                 foreach (JsonRecipe recipe in extractedRoot.Recipes)
                 {
-                    string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
                     string imagePath = Path.Combine(appDataPath, recipe.Hash + ".png");
                     recipesEntries.Add(new RecipeEntry(recipe.Hash,
                     recipe.Title, recipe.Description, imagePath, recipe.Categories,
@@ -101,7 +100,7 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
         {
             foreach (RecipeEntry recipeEntry in recipesEntries)
             {
-                string imageUrl = "/images/" + recipeEntry.Hash + ".png";
+                string imageUrl = "/images/" + recipeEntry.Hash;
                 try
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
@@ -112,7 +111,9 @@ public class OnlineRecipeListService(HttpClient httpClient) : IOnlineRecipeListS
                     }
                     else
                     {
-                        throw new Exception("Image download error. Status code: " + response.StatusCode);
+                        // throw new Exception("Image download error. Status code: " + response.StatusCode);
+                        // it is okay if there is no image
+                        recipeEntry.ImagePath = "";
                     }
                 }
                 catch (HttpRequestException)

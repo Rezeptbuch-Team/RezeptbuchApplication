@@ -1,4 +1,4 @@
-namespace ApplicationCore.Tests;
+namespace ApplicationCore.Tests.Helpers;
 
 public static class SqlHelper
 {

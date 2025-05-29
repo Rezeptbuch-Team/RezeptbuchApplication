@@ -5,29 +5,36 @@
              x:Class="GUI.View.ListRemoteRecipeView"
              xmlns:viewmodel="clr-namespace:GUI.ViewModel"
              xmlns:types="clr-namespace:ApplicationCore.Common.Types;assembly=ApplicationCore"
-             x:DataType="viewmodel:ListRemoteRecipeViewModel">
+             x:DataType="viewmodel:ListRemoteRecipeViewModel"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material">
     <ContentPage.Content>
         <Grid
-            RowDefinitions="60, *"
+            RowDefinitions="60, Auto, *"
             RowSpacing="10">
             <Grid
                 Grid.Row="0"
-                ColumnDefinitions=".6*, .2*, .2*"
+                ColumnDefinitions=".6*, .2*, .2*, .2*"
                 ColumnSpacing="10">
                 <Entry
                     Grid.Column="0"
                     Placeholder="Search Bar"
                     ClearButtonVisibility="WhileEditing"/>
-                <Button
+                <material:MultiplePickerField 
+                    Title="Pick some Filters"
                     Grid.Column="1"
-                    Text="Select Filter"/>
-                <Button
+                    ItemsSource="{Binding AvailableFilterOptions}"
+                    SelectedItems="{Binding SelectedFilters}"/>
+                <Picker
                     Grid.Column="2"
-                    Text="Sort By:"/>
+                    ItemsSource="{Binding OrderOptions}"
+                    SelectedItem="{Binding Path=SelectedOrderOption}"/>
+                <Button
+                    Grid.Column="3"
+                    Text="Apply Filter"
+                    Command="{Binding RefreshRecipesCommand}"/>
             </Grid>
-            
             <ListView
-                Grid.Row="1"
+                Grid.Row="2"
                 ItemsSource="{Binding RecipeEntries}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -35,9 +42,9 @@
                             x:DataType="types:RecipeEntry">
                             <Grid
                                 ColumnDefinitions="150, 250, *">
-                                <Label
+                                <Image
                                     Grid.Column="0"
-                                    Text="{Binding Path=Hash}"/>
+                                    Source="{Binding Path=ImagePath}"/>
                                 <Label
                                     Grid.Column="1"
                                     Text="{Binding Path=Title}"/>

@@ -6,7 +6,7 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class UploadService(IDatabaseService databaseService, HttpClient httpClient)
+public class UploadService(IDatabaseService databaseService, HttpClient httpClient, string appDataPath)
 {
     public async Task<(string uuid, string? imagePath, string last_published_hash, string xmlContent)> GetXmlFile(string hash)
     {
@@ -59,8 +59,6 @@ public class UploadService(IDatabaseService databaseService, HttpClient httpClie
                 throw new Exception("Last published hash missing");
             }
         }
-
-        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 
         return (uuid, imagePath, last_published_hash, File.ReadAllText(Path.Combine(appDataPath, filePath)));
     }

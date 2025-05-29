@@ -52,7 +52,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
         }
         #endregion
 
-        Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
+        Recipe recipe = getRecipeFromFileService.GetRecipeFromFile(filePath);
         recipe.PublishOption = publishOption;
 
         return recipe;

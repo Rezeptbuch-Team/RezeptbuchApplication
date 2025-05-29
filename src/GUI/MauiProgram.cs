@@ -3,9 +3,7 @@ using ApplicationCore.Model;
 using ApplicationCore.Interfaces;
 using GUI.View;
 using GUI.ViewModel;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.Controls.Hosting;
-using Microsoft.Maui.Hosting;
+using UraniumUI;
 
 namespace GUI;
 
@@ -16,6 +14,8 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.UseUraniumUI()
+			.UseUraniumUIMaterial()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -24,10 +24,22 @@ public static class MauiProgram
 
 		// needed for application core http clients
 		builder.Services.AddHttpClient<IOnlineRecipeListService, OnlineRecipeListService>(client => {
-			client.BaseAddress = new Uri("http://localhost:2222/list/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
+			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
 
-		builder.Services.AddSingleton<IDatabaseService, SqliteService>();
+		string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
+		StartupService.CreateAppDataFolder(appDataPath);
+
+		builder.Services.AddSingleton<string>(appDataPath);
+		builder.Services.AddSingleton<IDatabaseService>(sp =>
+		{
+			IDatabaseService databaseService = new SqliteService(appDataPath);
+			databaseService.InitializeAsync().Wait();
+			return databaseService;
+		});
+
+		builder.Services.AddSingleton<StartupService>();
+		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
 
 		// add Views and ViewModels
@@ -49,6 +61,12 @@ public static class MauiProgram
 				builder.Logging.AddDebug();
 		#endif
 
-		return builder.Build();
+		MauiApp app = builder.Build();
+
+		StartupService startupService = app.Services.GetRequiredService<StartupService>();
+		startupService.CheckForOrphanedFiles().Wait();
+		startupService.CheckForConflicts().Wait();
+
+		return app;
 	}
 }

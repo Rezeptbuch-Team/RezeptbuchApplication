@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 using Moq;
 
 namespace ApplicationCore.Tests.Tests;

@@ -1,5 +1,6 @@
 using ApplicationCore.Common.Types;
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -40,13 +41,13 @@ public class OnlineRecipeListServiceTests
     [SetUp]
     public void Setup()
     {
-        StartupService.CreateAppDataFolder();
+        StartupService.CreateAppDataFolder(FileHelper.GetAppDataPath());
 
         HttpClient httpClient = new()
         {
             BaseAddress = new Uri("http://api.server.com/")
         };
-        onlineRecipeListService = new(httpClient);
+        onlineRecipeListService = new(httpClient, FileHelper.GetAppDataPath());
     }
 
     [Test]
@@ -123,7 +124,7 @@ public class OnlineRecipeListServiceTests
         {
             BaseAddress = new Uri("http://api.server.com/")
         };
-        OnlineRecipeListService service = new(mockHttpClient);
+        OnlineRecipeListService service = new(mockHttpClient, FileHelper.GetAppDataPath());
         #endregion
 
         #region Act
@@ -205,7 +206,7 @@ public class OnlineRecipeListServiceTests
         {
             BaseAddress = new Uri("https://api.server.com/")
         };
-        OnlineRecipeListService service = new(mockHttpClient);
+        OnlineRecipeListService service = new(mockHttpClient, FileHelper.GetAppDataPath());
         #endregion
         #endregion
 
@@ -287,7 +288,7 @@ public class OnlineRecipeListServiceTests
         {
             BaseAddress = new Uri("https://api.server.com/")
         };
-        OnlineRecipeListService service = new(mockHttpClient);
+        OnlineRecipeListService service = new(mockHttpClient, FileHelper.GetAppDataPath());
         #endregion
         #endregion
 
@@ -359,7 +360,7 @@ public class OnlineRecipeListServiceTests
         {
             BaseAddress = new Uri("https://api.server.com/")
         };
-        OnlineRecipeListService service = new(mockHttpClient);
+        OnlineRecipeListService service = new(mockHttpClient, FileHelper.GetAppDataPath());
         #endregion
         #endregion
 
@@ -408,7 +409,7 @@ public class OnlineRecipeListServiceTests
         {
             BaseAddress = new Uri("https://api.server.com/")
         };
-        OnlineRecipeListService service = new(mockHttpClient);
+        OnlineRecipeListService service = new(mockHttpClient, FileHelper.GetAppDataPath());
         #endregion
 
         #region Act

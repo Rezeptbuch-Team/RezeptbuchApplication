@@ -3,6 +3,7 @@ using System.Data.Common;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 using Moq;
 using NUnit.Framework.Internal;
 
@@ -15,7 +16,7 @@ public class GetLocalRecipeServiceTests
     [SetUp]
     public void Setup()
     {
-        StartupService.CreateAppDataFolder();
+        StartupService.CreateAppDataFolder(FileHelper.GetAppDataPath());
         Mock<IOnlineIdentificationService> mock = new();
         mock.Setup(s => s.GetUUID()).ReturnsAsync("someUUID");
         onlineIdentificationService = mock.Object;
@@ -62,7 +63,7 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         // create the service and call the method
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService(FileHelper.GetAppDataPath()));
         Recipe resultRecipe = await service.GetRecipe(hash);
 
         // check that the queryAsync method was called
@@ -112,7 +113,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService(FileHelper.GetAppDataPath()));
 
         Assert.That(
             async () => await service.GetRecipe(hash),
@@ -167,7 +168,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService(FileHelper.GetAppDataPath()));
 
         Assert.DoesNotThrowAsync(async () => await service.GetRecipe(hash));
 
@@ -253,7 +254,7 @@ public class GetLocalRecipeServiceTests
         #endregion
         #endregion
 
-        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService());
+        GetLocalRecipeService service = new(mockDatabaseService.Object, onlineIdentificationService, new GetRecipeFromFileService(FileHelper.GetAppDataPath()));
 
         Recipe returnedRecipe = await service.GetRecipe(hash);
 
