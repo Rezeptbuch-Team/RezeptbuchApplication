@@ -1,5 +1,6 @@
 using System.Data.Common;
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 
 namespace ApplicationCore.Tests.Tests;
 
@@ -12,34 +13,39 @@ public class SqliteServiceTests
     [SetUp]
     public void StandardSetup()
     {
-        StartupService.CreateAppDataFolder();
+        StartupService.CreateAppDataFolder(FileHelper.GetAppDataPath());
     }
 
-    private static SqliteService Setup(string dbPath)
+    private static SqliteService Setup(string dbDir)
     {
+        if (!Directory.Exists(dbDir))
+        {
+            Directory.CreateDirectory(dbDir);
+        }
+        string dbPath = Path.Combine(dbDir, "database.sqlite");
         if (File.Exists(dbPath))
         {
             File.Delete(dbPath);
         }
-        return new SqliteService(dbPath);
+        return new SqliteService(dbDir);
     }
 
     [Test]
     public async Task Initialize_ShouldCreateDatabaseFile()
     {
-        string dbPath = "test.sqlite";
-        SqliteService sqliteService = Setup(dbPath);
+        string dbDir = Path.Combine(AppContext.BaseDirectory, "db1");
+        SqliteService sqliteService = Setup(dbDir);
 
         await sqliteService.InitializeAsync();
 
-        Assert.That(File.Exists(dbPath), Is.True);
+        Assert.That(File.Exists(Path.Combine(dbDir, "database.sqlite")), Is.True);
     }
 
     [Test]
     public async Task Initialize_ShouldAllowSubsequentOperations()
     {
-        string dbPath = "test2.sqlite";
-        SqliteService sqliteService = Setup(dbPath);
+        string dbDir = Path.Combine(AppContext.BaseDirectory, "db2");
+        SqliteService sqliteService = Setup(dbDir);
 
         await sqliteService.InitializeAsync();
 

@@ -17,7 +17,7 @@ public class SqliteService : IDatabaseService {
     private readonly string _dbPath;
 
     public SqliteService(string appDataPath) {
-        string _dbPath = Path.Combine(appDataPath, "database.sqlite");
+        _dbPath = Path.Combine(appDataPath, "database.sqlite");
         _connectionString = $"Data Source={_dbPath}";
     }
 
@@ -51,7 +51,7 @@ public class SqliteService : IDatabaseService {
         using var reader = new StreamReader(stream!);
         string schemaSql = reader.ReadToEnd();
         #endregion
-        
+
         #region Create database
         await using SqliteConnection connection = new(_connectionString);
         await connection.OpenAsync();

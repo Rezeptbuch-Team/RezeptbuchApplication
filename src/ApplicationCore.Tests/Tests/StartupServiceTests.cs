@@ -1,4 +1,5 @@
 using ApplicationCore.Model;
+using ApplicationCore.Tests.Helpers;
 
 namespace ApplicationCore.Tests.Tests;
 
@@ -12,7 +13,7 @@ public class StartupServiceTests
 
         if (Directory.Exists(dirPath)) Directory.Delete(dirPath, recursive: true);
 
-        StartupService.CreateAppDataFolder();
+        StartupService.CreateAppDataFolder(FileHelper.GetAppDataPath());
 
         Assert.That(Directory.Exists(dirPath), Is.True);
     }
