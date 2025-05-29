@@ -6,12 +6,11 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class GetRecipeFromFileService : IGetRecipeFromFileService
+public class GetRecipeFromFileService(string appDataPath) : IGetRecipeFromFileService
 {
     public Recipe GetRecipeFromFile(string filePath)
     {
         #region check that recipe xml-file fits schema
-        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         filePath = Path.Combine(appDataPath, filePath);
 
         var asm = typeof(SqliteService).Assembly;

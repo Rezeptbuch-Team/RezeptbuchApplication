@@ -5,7 +5,7 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class StartupService(IDatabaseService databaseService, IGetRecipeFromFileService getRecipeFromFileService)
+public class StartupService(IDatabaseService databaseService, IGetRecipeFromFileService getRecipeFromFileService, string appDataPath)
 {
     #region Helper functions
     private async Task UpdateDatabaseWithModifiedHash(string hash, string updatedHash)
@@ -64,16 +64,15 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         }
     }
 
-    private static IEnumerable<string> XmlFilesInDirectory()
+    private IEnumerable<string> XmlFilesInDirectory()
     {
-        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
         foreach (string filePath in Directory.EnumerateFiles(appDataPath, "*.xml", SearchOption.AllDirectories))
         {
             yield return filePath;
         }
     }
 
-    private static string? FindFileWithHash(string hash)
+    private string? FindFileWithHash(string hash)
     {
         foreach (string filePath in XmlFilesInDirectory())
         {
@@ -193,10 +192,9 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
     }
     #endregion
 
-    public static void CreateAppDataFolder()
+    public static void CreateAppDataFolder(string appDataPath)
     {
-        string dirPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
-        if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+        if (!Directory.Exists(appDataPath)) Directory.CreateDirectory(appDataPath);
     }
 
     public async Task CheckForConflicts()
