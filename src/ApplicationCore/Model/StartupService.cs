@@ -143,24 +143,21 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
             await databaseService.NonQueryAsync(insertCategorySql, parameters);
             string getCategoryIdSql = @"SELECT id FROM categories
                                         WHERE name = $name;";
+            long? categoryId = null;
             await using (DbDataReader reader = await databaseService.QueryAsync(getCategoryIdSql, parameters))
             {
-                if (await reader.ReadAsync())
-                {
-                    int? categoryId = reader.GetValue(0) as int?;
-                    if (categoryId != null)
-                    {
-                        string insertRecipeCategorySql = @"INSERT OR IGNORE INTO recipe_category(hash, category_id)
-                                                            VALUES ($hash, $catId);";
-                        Dictionary<string, object> insertRecipeCategoryParameters = new()
-                        {
-                            { "$hash", recipe.Hash },
-                            { "$catId", categoryId }
-                        };
-                        await databaseService.NonQueryAsync(insertRecipeCategorySql, insertRecipeCategoryParameters);
-                    }
-                }
+                if (!await reader.ReadAsync()) continue;
+                categoryId = reader.GetInt64(0);
             }
+            if (categoryId == null) continue;
+            string insertRecipeCategorySql = @"INSERT OR IGNORE INTO recipe_category(hash, category_id)
+                                                VALUES ($hash, $catId);";
+            Dictionary<string, object> insertRecipeCategoryParameters = new()
+            {
+                { "$hash", recipe.Hash },
+                { "$catId", categoryId }
+            };
+            await databaseService.NonQueryAsync(insertRecipeCategorySql, insertRecipeCategoryParameters);
         }
         #endregion
 
@@ -176,24 +173,21 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
             await databaseService.NonQueryAsync(insertIngredientSql, parameters);
             string getIngredientIdSql = @"SELECT id FROM ingredients
                                         WHERE name = $name;";
+            long? ingId = null;
             await using (DbDataReader reader = await databaseService.QueryAsync(getIngredientIdSql, parameters))
             {
-                if (await reader.ReadAsync())
-                {
-                    int? ingId = reader.GetValue(0) as int?;
-                    if (ingId != null)
-                    {
-                        string insertRecipeIngredientSql = @"INSERT OR IGNORE INTO recipe_ingredient(hash, ingredient_id)
-                                                            VALUES ($hash, $ingId);";
-                        Dictionary<string, object> insertRecipeIngredientParameters = new()
-                        {
-                            { "$hash", recipe.Hash },
-                            { "$ingId", ingId }
-                        };
-                        await databaseService.NonQueryAsync(insertRecipeIngredientSql, insertRecipeIngredientParameters);
-                    }
-                }
+                if (!await reader.ReadAsync()) continue;
+                ingId = reader.GetInt64(0);
             }
+            if (ingId == null) continue;
+            string insertRecipeIngredientSql = @"INSERT OR IGNORE INTO recipe_ingredient(hash, ingredient_id)
+                                                VALUES ($hash, $ingId);";
+            Dictionary<string, object> insertRecipeIngredientParameters = new()
+            {
+                { "$hash", recipe.Hash },
+                { "$ingId", ingId }
+            };
+            await databaseService.NonQueryAsync(insertRecipeIngredientSql, insertRecipeIngredientParameters);
         }
         #endregion
     }
@@ -215,7 +209,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         {
             string? filePath;
             string? hash;
-            if (await resultReader.ReadAsync())
+            while (await resultReader.ReadAsync())
             {
                 filePath = resultReader.GetValue(0) as string;
                 hash = resultReader.GetValue(1) as string;
@@ -235,6 +229,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
             }
             else
             {
+                await DeleteEntryFromDatabase(recipeEntry.Value);
                 string? foundFile = FindFileWithHash(recipeEntry.Value);
                 if (foundFile != null)
                 {

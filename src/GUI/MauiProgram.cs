@@ -3,9 +3,6 @@ using ApplicationCore.Model;
 using ApplicationCore.Interfaces;
 using GUI.View;
 using GUI.ViewModel;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.Controls.Hosting;
-using Microsoft.Maui.Hosting;
 using UraniumUI;
 
 namespace GUI;

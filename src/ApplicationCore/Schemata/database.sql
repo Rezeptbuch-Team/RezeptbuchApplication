@@ -18,26 +18,26 @@ CREATE TABLE "recipes" (
 
 CREATE TABLE "categories" (
   "id" INTEGER PRIMARY KEY,
-  "name" TEXT
+  "name" TEXT UNIQUE
 );
 
 CREATE TABLE "recipe_category" (
   "hash" TEXT NOT NULL,
   "category_id" INTEGER NOT NULL,
   PRIMARY KEY ("hash", "category_id"),
-  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash"),
+  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash") ON DELETE CASCADE,
   FOREIGN KEY ("category_id") REFERENCES "categories" ("id")
 );
 
 CREATE TABLE "ingredients" (
   "id" INTEGER PRIMARY KEY,
-  "name" TEXT
+  "name" TEXT UNIQUE
 );
 
 CREATE TABLE "recipe_ingredient" (
   "hash" TEXT NOT NULL,
   "ingredient_id" INTEGER NOT NULL,
   PRIMARY KEY ("hash", "ingredient_id"),
-  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash"),
+  FOREIGN KEY ("hash") REFERENCES "recipes" ("hash") ON DELETE CASCADE,
   FOREIGN KEY ("ingredient_id") REFERENCES "ingredients" ("id")
 );
