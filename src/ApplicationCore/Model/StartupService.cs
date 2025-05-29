@@ -42,7 +42,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
     {
         try
         {
-            Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
+            Recipe recipe = getRecipeFromFileService.GetRecipeFromFile(filePath);
             string calculatedHash = recipe.CalculateHash();
             // if hash of recipe does not fit entry in database
             if (calculatedHash != databaseHash)
@@ -101,7 +101,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
 
     private async Task<bool> IsHashInDatabase(string hash)
     {
-        string sql = @"SELECT COUNT(*)
+        string sql = @"SELECT hash
                         FROM recipes
                         WHERE hash = $hash;";
         Dictionary<string, object> parameters = new()
@@ -256,7 +256,7 @@ public class StartupService(IDatabaseService databaseService, IGetRecipeFromFile
         {
             try
             {
-                Recipe recipe = await getRecipeFromFileService.GetRecipeFromFile(filePath);
+                Recipe recipe = getRecipeFromFileService.GetRecipeFromFile(filePath);
                 if (!await IsHashInDatabase(recipe.Hash))
                 {
                     await AddRecipeToDatabase(recipe, filePath);

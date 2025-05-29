@@ -8,7 +8,7 @@ namespace ApplicationCore.Model;
 
 public class GetRecipeFromFileService : IGetRecipeFromFileService
 {
-    public async Task<Recipe> GetRecipeFromFile(string filePath)
+    public Recipe GetRecipeFromFile(string filePath)
     {
         #region check that recipe xml-file fits schema
         string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
@@ -26,17 +26,18 @@ public class GetRecipeFromFileService : IGetRecipeFromFileService
         settings.Schemas.Add(null, xsdReader);
         settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
 
-        using (XmlReader reader = XmlReader.Create(filePath, settings))
+        using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
+        using XmlReader reader = XmlReader.Create(fs, settings);
+        while (reader.Read())
         {
-            while (await reader.ReadAsync())
-            {
-                // Just go through the document
-            }
+            // process nodes…
         }
         #endregion
 
         #region deserialize recipe xml
-        XDocument doc = XDocument.Parse(await File.ReadAllTextAsync(filePath));
+        var xmlContent = File.ReadAllText(filePath);
+        XDocument doc = XDocument.Parse(xmlContent);
+
         // because the xml has been validated there is no need to check for null values
         XElement root = doc.Element("recipe")!;
         Recipe recipe = new()

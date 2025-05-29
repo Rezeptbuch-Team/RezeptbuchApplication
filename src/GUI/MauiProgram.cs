@@ -38,7 +38,9 @@ public static class MauiProgram
 			databaseService.InitializeAsync().Wait();
 			return databaseService;
 		});
-		
+
+		builder.Services.AddSingleton<StartupService>();
+		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
 
 		// add Views and ViewModels
@@ -60,6 +62,12 @@ public static class MauiProgram
 				builder.Logging.AddDebug();
 		#endif
 
-		return builder.Build();
+		MauiApp app = builder.Build();
+
+		StartupService startupService = app.Services.GetRequiredService<StartupService>();
+		startupService.CheckForOrphanedFiles().Wait();
+		startupService.CheckForConflicts().Wait();
+
+		return app;
 	}
 }
