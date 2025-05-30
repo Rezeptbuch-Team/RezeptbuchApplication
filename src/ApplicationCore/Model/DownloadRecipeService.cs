@@ -6,18 +6,8 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class DownloadRecipeService(HttpClient httpClient, IGetRecipeFromFileService getRecipeFromFileService, IDatabaseService databaseService, string appDataPath) : IDownloadRecipeService
+public class DownloadRecipeService(HttpClient httpClient, IGetRecipeFromFileService getRecipeFromFileService, IDatabaseService databaseService, OnlineRecipeListService onlineRecipeListService, string appDataPath) : IDownloadRecipeService
 {
-    public async Task DownloadImage(string hash, string filePath)
-    {
-        string imageUrl = "/images/" + hash;
-        HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
-
-        response.EnsureSuccessStatusCode();
-
-        using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await response.Content.CopyToAsync(fileStream);
-    }
 
     public async Task<bool> IsHashInDatabase(string hash)
     {
@@ -145,7 +135,7 @@ public class DownloadRecipeService(HttpClient httpClient, IGetRecipeFromFileServ
         {
             try
             {
-                await DownloadImage(hash, newImageFilePath);
+                await onlineRecipeListService.DownloadImage(hash, newImageFilePath);
             }
             catch
             {
