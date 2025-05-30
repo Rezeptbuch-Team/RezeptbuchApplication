@@ -26,6 +26,9 @@ public static class MauiProgram
 		builder.Services.AddHttpClient<IOnlineRecipeListService, OnlineRecipeListService>(client => {
 			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
+		builder.Services.AddHttpClient<IDownloadRecipeService, DownloadRecipeService>(client => {
+			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
+		});
 
 		string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
 		StartupService.CreateAppDataFolder(appDataPath);
@@ -41,6 +44,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<StartupService>();
 		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
+		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
 
 		// add Views and ViewModels
 		builder.Services.AddTransient<ListLocalRecipeView>();

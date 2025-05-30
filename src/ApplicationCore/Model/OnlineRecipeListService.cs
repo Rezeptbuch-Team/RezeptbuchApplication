@@ -32,7 +32,7 @@ public class JsonCategories
     public required List<string> Categories { get; set; }
 }
 
-public class OnlineRecipeListService(HttpClient httpClient, string appDataPath) : IOnlineRecipeListService
+public class OnlineRecipeListService(HttpClient httpClient, IDownloadRecipeService downloadRecipeService, string appDataPath) : IOnlineRecipeListService
 {
     public string BuildListUrl(Filter filter)
     {
@@ -100,21 +100,9 @@ public class OnlineRecipeListService(HttpClient httpClient, string appDataPath) 
         {
             foreach (RecipeEntry recipeEntry in recipesEntries)
             {
-                string imageUrl = "/images/" + recipeEntry.Hash;
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        using FileStream fileStream = new(recipeEntry.ImagePath, FileMode.Create, FileAccess.Write, FileShare.None);
-                        await response.Content.CopyToAsync(fileStream);
-                    }
-                    else
-                    {
-                        // throw new Exception("Image download error. Status code: " + response.StatusCode);
-                        // it is okay if there is no image
-                        recipeEntry.ImagePath = "";
-                    }
+                    await downloadRecipeService.DownloadImage(recipeEntry.Hash, recipeEntry.ImagePath);
                 }
                 catch (HttpRequestException)
                 {
