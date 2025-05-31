@@ -32,8 +32,19 @@ public class JsonCategories
     public required List<string> Categories { get; set; }
 }
 
-public class OnlineRecipeListService(HttpClient httpClient, IDownloadRecipeService downloadRecipeService, string appDataPath) : IOnlineRecipeListService
+public class OnlineRecipeListService(HttpClient httpClient, string appDataPath) : IOnlineRecipeListService
 {
+    public async Task DownloadImage(string hash, string filePath)
+    {
+        string imageUrl = "/images/" + hash;
+        HttpResponseMessage response = await httpClient.GetAsync(imageUrl);
+
+        response.EnsureSuccessStatusCode();
+
+        using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        await response.Content.CopyToAsync(fileStream);
+    }
+
     public string BuildListUrl(Filter filter)
     {
         string url = "/recipes?";
@@ -102,7 +113,7 @@ public class OnlineRecipeListService(HttpClient httpClient, IDownloadRecipeServi
             {
                 try
                 {
-                    await downloadRecipeService.DownloadImage(recipeEntry.Hash, recipeEntry.ImagePath);
+                    await DownloadImage(recipeEntry.Hash, recipeEntry.ImagePath);
                 }
                 catch (HttpRequestException)
                 {
