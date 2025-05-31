@@ -15,7 +15,6 @@ public partial class ShowRecipeViewModel : ObservableObject, IQueryAttributable
         {
             _recipe = value;
             Servings = "1";
-            ImagePath = value.ImagePath;
             OnPropertyChanged(nameof(Title));
             OnPropertyChanged(nameof(ImagePath));
             OnPropertyChanged(nameof(Description));
