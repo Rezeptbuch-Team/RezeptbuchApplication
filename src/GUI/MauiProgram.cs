@@ -43,15 +43,16 @@ public static class MauiProgram
 
 		builder.Services.AddSingleton<StartupService>();
 		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
+		builder.Services.AddSingleton<IGetLocalRecipeService, GetLocalRecipeService>();
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
-		builder.Services.AddSingleton<IGetRecipeFromFileService, GetRecipeFromFileService>();
+		builder.Services.AddSingleton<IOnlineIdentificationService, OnlineIdentificationService>();
 
 		// add Views and ViewModels
-		builder.Services.AddTransient<ListLocalRecipeView>();
-		builder.Services.AddTransient<ListLocalRecipeViewModel>();
+		builder.Services.AddSingleton<ListLocalRecipeView>();
+		builder.Services.AddSingleton<ListLocalRecipeViewModel>();
 
-		builder.Services.AddTransient<ListRemoteRecipeView>();
-		builder.Services.AddTransient<ListRemoteRecipeViewModel>();
+		builder.Services.AddSingleton<ListRemoteRecipeView>();
+		builder.Services.AddSingleton<ListRemoteRecipeViewModel>();
 
 		builder.Services.AddTransient<ShowRecipeView>();
 		builder.Services.AddTransient<ShowRecipeViewModel>();

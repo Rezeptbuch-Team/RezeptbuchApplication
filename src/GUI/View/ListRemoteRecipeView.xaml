@@ -13,7 +13,7 @@
             RowSpacing="10">
             <Grid
                 Grid.Row="0"
-                ColumnDefinitions=".6*, .2*, .2*, .2*"
+                ColumnDefinitions=".6*, .2*, .2*, .2*, .2*"
                 ColumnSpacing="10">
                 <Entry
                     Grid.Column="0"
@@ -32,10 +32,16 @@
                     Grid.Column="3"
                     Text="Apply Filter"
                     Command="{Binding RefreshRecipesCommand}"/>
+                <Button
+                    Grid.Column="4"
+                    Text="Download Selected"
+                    Command="{Binding DownloadRecipeCommand}"></Button>
             </Grid>
             <ListView
                 Grid.Row="2"
-                ItemsSource="{Binding RecipeEntries}">
+                ItemsSource="{Binding RecipeEntries}"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedRecipeEntry}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell

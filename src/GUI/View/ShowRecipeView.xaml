@@ -16,22 +16,34 @@
                 Text="Publish"/>
             <Grid
                 Grid.Row="1"
-                ColumnDefinitions="*, AUTO">
+                ColumnDefinitions="*, *">
                 <Grid
                     Grid.Column="0"
-                    RowDefinitions="40, 40, 40, *">
+                    RowDefinitions="40, 40, 40, 40, *">
                     <Label
                         Grid.Row="0"
-                        Text="{Binding RecipeName}"/>
+                        Text="{Binding Title}"/>
                     <Label
                         Grid.Row="1"
-                        Text="{Binding Path=RecipeTime, StringFormat='Time: {0} minutes'}"/>
-                    <Label
+                        Text="{Binding Path=CookingTime, StringFormat='Time: {0} minutes'}"/>
+                    <Grid
                         Grid.Row="2"
+                        ColumnDefinitions="AUTO, *">
+                        <Label
+                            Grid.Column="0"
+                            Text="Servings:"/>
+                        <Entry
+                            Grid.Column="1"
+                            Keyboard="Numeric"
+                            Text="{Binding Servings}"
+                            Placeholder="Please enter the desired serving count!"/>
+                    </Grid>
+                    <Label
+                        Grid.Row="3"
                         Text="Ingredients:"/>
                     <ListView
-                        Grid.Row="3"
-                        ItemsSource="{Binding RecipeIngredients}">
+                        Grid.Row="4"
+                        ItemsSource="{Binding Ingredients}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell
@@ -52,11 +64,11 @@
                 </Grid>
                 <Image
                     Grid.Column="1"
-                    Source="{Binding RecipeImage}"/>
+                    Source="{Binding ImagePath}"/>
             </Grid>
             <Label
                 Grid.Row="2"
-                Text="{Binding RecipeDescription}"/>
+                Text="{Binding Description}"/>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

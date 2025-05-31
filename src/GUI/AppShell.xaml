@@ -20,11 +20,6 @@
                 Route="ListRemoteRecipeView"/>
         </Tab>
         <Tab
-            Title="Show Recipe">
-            <ShellContent
-                ContentTemplate="{DataTemplate view:ShowRecipeView}"/>
-        </Tab>
-        <Tab
             Title="Navigate">
             <ShellContent 
                 ContentTemplate="{DataTemplate view:NavigateThroughRecipeView}"

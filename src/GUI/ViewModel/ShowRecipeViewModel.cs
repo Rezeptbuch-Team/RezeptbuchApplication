@@ -1,48 +1,61 @@
 using System.Collections.ObjectModel;
 using ApplicationCore.Common.Types;
+using ApplicationCore.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Maui.Controls;
 
 namespace GUI.ViewModel;
 
-public partial class ShowRecipeViewModel : ObservableObject
+[QueryProperty(nameof(Recipe), "Recipe")]
+public partial class ShowRecipeViewModel : ObservableObject, IQueryAttributable
 {
-    public ShowRecipeViewModel()
+    public Recipe Recipe
     {
-        RecipeName = "Recipe Name";
-        RecipeTime = 10;
-        RecipeIngredients = [
-        new Ingredient() {
-            Name="Ingredient1",
-            Amount=500,
-            Unit="ml"
-        },
-        new Ingredient() {
-            Name="Ingredient2",
-            Amount=200,
-            Unit="g"
-        },
-        new Ingredient() {
-            Name="Ingredient3",
-            Amount=60,
-            Unit="g"
-        }];
-        RecipeDescription = "Recipe Description";
-        RecipeImage = "dotnet_bot.png";
+        set
+        {
+            _recipe = value;
+            Servings = "1";
+            ImagePath = value.ImagePath;
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(ImagePath));
+            OnPropertyChanged(nameof(Description));
+            OnPropertyChanged(nameof(CookingTime));
+        }
     }
-    
-    [ObservableProperty] 
-    private string _recipeName;
-    
-    [ObservableProperty]
-    private int _recipeTime;
-    
-    [ObservableProperty]
-    private ObservableCollection<Ingredient> _recipeIngredients;
-    
-    [ObservableProperty]
-    private string _recipeDescription;
 
-    [ObservableProperty] 
-    private ImageSource? _recipeImage;
+    private Recipe? _recipe;
+    
+    public string? Title => _recipe?.Title;
+
+    public string ImagePath
+    {
+        get =>
+            _recipe != null ? _recipe!.ImagePath : "";
+        set => _recipe!.ImagePath = value;
+    }
+
+    public string? Description => _recipe?.Description;
+    
+    public string? Servings
+    {
+        get => _servings.ToString();
+        set
+        {
+            if(!int.TryParse(value, out var servings)) return;
+            SetProperty(ref _servings, servings);
+            Ingredients = _recipe == null ? null : new ObservableCollection<Ingredient>(_recipe.GetIngredients(servings));
+        }
+    }
+
+    private int? _servings;
+    
+    public int? CookingTime => _recipe?.CookingTime;
+    
+    [ObservableProperty]
+    private ObservableCollection<Ingredient>? _ingredients;
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        Recipe = (query[nameof(Recipe)] as Recipe)!;
+    }
 }
