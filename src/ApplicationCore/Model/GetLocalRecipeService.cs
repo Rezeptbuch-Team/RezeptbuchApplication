@@ -10,7 +10,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
     public async Task<Recipe> GetRecipe(string hash)
     {
         #region request filepath and publishinformation from database
-        string sql = @"SELECT file_path, is_download, is_published, is_modified
+        string sql = @"SELECT file_path, is_download, is_published, is_modified, image_path
                         FROM recipes
                         WHERE hash = $hash;";
 
@@ -20,6 +20,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
         string filePath;
         PublishOption publishOption;
         string? uuid = await onlineIdentificationService.GetUUID();
+        string? imagePath = null;
         await using (DbDataReader resultReader = await databaseService.QueryAsync(sql, parameters))
         {
             if (await resultReader.ReadAsync())
@@ -30,6 +31,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
                     bool is_download = resultReader.GetInt32(1) > 0;
                     bool is_published = resultReader.GetInt32(2) > 0;
                     bool is_modified = resultReader.GetInt32(3) > 0;
+                    imagePath = resultReader.GetValue(4) as string;
 
                     if (is_download || uuid == null) publishOption = PublishOption.FORBIDDEN;
                     else if (!is_published) publishOption = PublishOption.NOT_PUBLISHED;
@@ -54,6 +56,7 @@ public class GetLocalRecipeService(IDatabaseService databaseService, IOnlineIden
 
         Recipe recipe = getRecipeFromFileService.GetRecipeFromFile(filePath);
         recipe.PublishOption = publishOption;
+        recipe.ImagePath = imagePath ?? "";
 
         return recipe;
     }
