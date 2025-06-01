@@ -36,7 +36,7 @@ public class GetLocalRecipeServiceTests
         File.Copy(exampleRecipePath, absoluteFilePath);
 
         #region database mock
-        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified, image_path
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
@@ -45,7 +45,8 @@ public class GetLocalRecipeServiceTests
         table.Columns.Add("is_download", typeof(int));
         table.Columns.Add("is_published", typeof(int));
         table.Columns.Add("is_modified", typeof(int));
-        table.Rows.Add(filePath, 0, 1, 0);
+        table.Columns.Add("image_path", typeof(string));
+        table.Rows.Add(filePath, 0, 1, 0, "someImage.png");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -87,7 +88,7 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         #region mock database
-        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified, image_path
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
@@ -96,7 +97,8 @@ public class GetLocalRecipeServiceTests
         table.Columns.Add("is_download", typeof(int));
         table.Columns.Add("is_published", typeof(int));
         table.Columns.Add("is_modified", typeof(int));
-        table.Rows.Add(filePath, 0, 1, 0);
+        table.Columns.Add("image_path", typeof(string));
+        table.Rows.Add(filePath, 0, 1, 0, "someImage.png");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -142,7 +144,7 @@ public class GetLocalRecipeServiceTests
         #endregion
 
         #region mock database
-        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified, image_path
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
@@ -151,7 +153,8 @@ public class GetLocalRecipeServiceTests
         table.Columns.Add("is_download", typeof(int));
         table.Columns.Add("is_published", typeof(int));
         table.Columns.Add("is_modified", typeof(int));
-        table.Rows.Add(filePath, 0, 1, 0);
+        table.Columns.Add("image_path", typeof(string));
+        table.Rows.Add(filePath, 0, 1, 0, "someImage.png");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
@@ -204,7 +207,7 @@ public class GetLocalRecipeServiceTests
             Hash = "asd",
             PublishOption = PublishOption.PUBLISHED,
             Title = "Pasta",
-            ImagePath = "pasta.png",
+            ImagePath = "pastaRecipe.png",
             Description = "Simple pasta recipe.",
             Servings = 2,
             CookingTime = 20,
@@ -228,7 +231,7 @@ public class GetLocalRecipeServiceTests
         File.Copy(exampleRecipePath, absoluteFilePath);
         #endregion
         #region mock database
-        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified
+        string expectedSql = @"SELECT file_path, is_download, is_published, is_modified, image_path
                                 FROM recipes
                                 WHERE hash = $hash;";
         #region create a fake DataTable to simulate the database response
@@ -237,7 +240,8 @@ public class GetLocalRecipeServiceTests
         table.Columns.Add("is_download", typeof(int));
         table.Columns.Add("is_published", typeof(int));
         table.Columns.Add("is_modified", typeof(int));
-        table.Rows.Add(filePath, 0, 1, 0);
+        table.Columns.Add("image_path", typeof(string));
+        table.Rows.Add(filePath, 0, 1, 0, "pastaRecipe.png");
         DbDataReader fakeReader = table.CreateDataReader();
         #endregion
 
