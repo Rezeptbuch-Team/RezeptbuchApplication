@@ -162,6 +162,7 @@
     </Style>
 
     <Style TargetType="Label">
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
