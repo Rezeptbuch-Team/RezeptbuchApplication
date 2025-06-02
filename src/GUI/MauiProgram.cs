@@ -59,8 +59,6 @@ public static class MauiProgram
 		
 		builder.Services.AddTransient<NavigateThroughRecipeView>();
 		builder.Services.AddTransient<NavigateThroughRecipeViewModel>();
-
-		builder.Services.AddTransient<CreateRecipeView>();
 		
 		#if DEBUG
 				builder.Logging.AddDebug();

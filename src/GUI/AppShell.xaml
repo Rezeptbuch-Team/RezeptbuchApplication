@@ -19,17 +19,5 @@
                 ContentTemplate="{DataTemplate view:ListRemoteRecipeView}"
                 Route="ListRemoteRecipeView"/>
         </Tab>
-        <Tab
-            Title="Navigate">
-            <ShellContent 
-                ContentTemplate="{DataTemplate view:NavigateThroughRecipeView}"
-                Route="NavigateThroughRecipeView"/>
-        </Tab>
-        <Tab
-            Title="Create">
-            <ShellContent 
-                ContentTemplate="{DataTemplate view:CreateRecipeView}"
-                Route="CreateRecipeView"/>
-        </Tab>
     </TabBar>
 </Shell>

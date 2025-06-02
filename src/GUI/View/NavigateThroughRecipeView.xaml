@@ -11,24 +11,26 @@
             RowSpacing="10">
             <Label
                 Grid.Row="0"
-                Text="Recipe Name"/>
+                Text="{Binding Title}"/>
             <Label
                 Grid.Row="1"
-                Text="Step Number"/>
+                Text="{Binding Path=CurrentStepIndex, StringFormat='Current Step {0}'}"/>
             <Grid
                 Grid.Row="2"
                 ColumnDefinitions="100, *, 100"
                 ColumnSpacing="10">
                 <Button
                     Grid.Column="0"
-                    Text="Back"/>
+                    Text="Previous"
+                    Command="{Binding PreviousStepCommand}"/>
                 <Label
                     Grid.Column="1"
                     Text="{Binding StepDescription}"
                     VerticalTextAlignment="Center"/>
                 <Button
                     Grid.Column="2"
-                    Text="Next"/>
+                    Text="Next"
+                    Command="{Binding NextStepCommand}"/>
             </Grid>
         </Grid>
     </ContentPage.Content>

@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using ApplicationCore.Common.Types;
-using ApplicationCore.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Maui.Controls;
+using CommunityToolkit.Mvvm.Input;
+using GUI.View;
 
 namespace GUI.ViewModel;
 
@@ -56,5 +56,12 @@ public partial class ShowRecipeViewModel : ObservableObject, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         Recipe = (query[nameof(Recipe)] as Recipe)!;
+    }
+
+    [RelayCommand]
+    private async Task NavigateThroughRecipe()
+    {
+        var navigationParameter = new Dictionary<string, object> { { "Recipe", _recipe! } };
+        await Shell.Current.GoToAsync($"{nameof(NavigateThroughRecipeView)}", navigationParameter);
     }
 }

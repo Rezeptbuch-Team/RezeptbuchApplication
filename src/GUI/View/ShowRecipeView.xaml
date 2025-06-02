@@ -13,7 +13,8 @@
             <Button
                 Grid.Row="0"
                 VerticalOptions="End"
-                Text="Publish"/>
+                Text="Navigate Recipe"
+                Command="{Binding NavigateThroughRecipeCommand}"/>
             <Grid
                 Grid.Row="1"
                 ColumnDefinitions="*, *">
