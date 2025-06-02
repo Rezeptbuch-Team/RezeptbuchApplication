@@ -117,7 +117,8 @@ public class OnlineRecipeListService(HttpClient httpClient, string appDataPath) 
                 }
                 catch (HttpRequestException)
                 {
-                    throw new Exception("API unreachable");
+                    // some have no image
+                    recipeEntry.ImagePath = "";
                 }
             }
         }

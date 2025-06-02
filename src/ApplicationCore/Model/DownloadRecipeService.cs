@@ -6,7 +6,7 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Model;
 
-public class DownloadRecipeService(HttpClient httpClient, IGetRecipeFromFileService getRecipeFromFileService, IDatabaseService databaseService, OnlineRecipeListService onlineRecipeListService, string appDataPath) : IDownloadRecipeService
+public class DownloadRecipeService(HttpClient httpClient, IGetRecipeFromFileService getRecipeFromFileService, IDatabaseService databaseService, IOnlineRecipeListService onlineRecipeListService, string appDataPath) : IDownloadRecipeService
 {
 
     public async Task<bool> IsHashInDatabase(string hash)
