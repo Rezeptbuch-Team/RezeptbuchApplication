@@ -30,13 +30,13 @@ public static class MauiProgram
 			client.BaseAddress = new Uri("https://rezeptbuchapi.onrender.com/"); // replace with url from configuration. for example: builder.Configuration["base_url"]
 		});
 
-		string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rezeptbuch");
+		string appDataPath = Path.Combine(FileSystem.AppDataDirectory, "Rezeptbuch");
 		StartupService.CreateAppDataFolder(appDataPath);
 
 		builder.Services.AddSingleton<string>(appDataPath);
 		builder.Services.AddSingleton<IDatabaseService>(sp =>
 		{
-			IDatabaseService databaseService = new SqliteService(appDataPath);
+			SqliteService databaseService = new SqliteService(appDataPath);
 			databaseService.InitializeAsync().Wait();
 			return databaseService;
 		});

@@ -40,7 +40,7 @@ public partial class ShowRecipeViewModel : ObservableObject, IQueryAttributable
         get => _servings.ToString();
         set
         {
-            if(!int.TryParse(value, out var servings)) return;
+            if(!int.TryParse(value, out int servings)) return;
             SetProperty(ref _servings, servings);
             Ingredients = _recipe == null ? null : new ObservableCollection<Ingredient>(_recipe.GetIngredients(servings));
         }

@@ -34,7 +34,7 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
     [RelayCommand(CanExecute = nameof(RecipeSelected))]
     private async Task OpenRecipe()
     {
-        var curRecipe = await _getLocalRecipeService.GetRecipe(SelectedRecipeEntry!.Hash);
+        Recipe curRecipe = await _getLocalRecipeService.GetRecipe(SelectedRecipeEntry!.Hash);
         var navigationParameter = new Dictionary<string, object> { { "Recipe", curRecipe } };
         await Shell.Current.GoToAsync($"{nameof(ShowRecipeView)}", navigationParameter);
     }
@@ -42,6 +42,10 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
     [RelayCommand]
     private async Task OpenRecipesFolder()
     {
+        #if WINDOWS
         Process.Start("explorer.exe", AppDataPath);
+        #else
+        Process.Start("open", AppDataPath);
+        #endif
     }
 }
