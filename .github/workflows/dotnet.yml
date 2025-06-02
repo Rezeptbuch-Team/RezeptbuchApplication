@@ -25,7 +25,7 @@ jobs:
     - name: Build ApplicationCore and Tests
       run: dotnet build ./src/ApplicationCore.Tests/ApplicationCore.Tests.csproj --no-restore
     - name: Run Tests
-      run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+      run: dotnet test ./src/ApplicationCore.Tests/ApplicationCore.Tests.csproj --no-build --verbosity normal --collect:"XPlat Code Coverage"
 
     # ReportGenerator installieren (als .NET Global Tool)
     - name: Install ReportGenerator
