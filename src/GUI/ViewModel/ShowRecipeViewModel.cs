@@ -61,7 +61,7 @@ public partial class ShowRecipeViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task NavigateThroughRecipe()
     {
-        var navigationParameter = new Dictionary<string, object> { { "Recipe", _recipe! } };
+        var navigationParameter = new Dictionary<string, object> { { "Recipe", _recipe!} , {"Servings", _servings ?? 0} };
         await Shell.Current.GoToAsync($"{nameof(NavigateThroughRecipeView)}", navigationParameter);
     }
 }
