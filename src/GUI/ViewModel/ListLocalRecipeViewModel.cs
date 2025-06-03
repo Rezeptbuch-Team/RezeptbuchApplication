@@ -44,7 +44,7 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
     {
         #if WINDOWS
         Process.Start("explorer.exe", AppDataPath);
-        #else
+        #elif MACCATALYST
         Process.Start("open", AppDataPath);
         #endif
     }
