@@ -37,11 +37,10 @@ public partial class ListRecipeViewModel : ObservableObject
         RecipeEntries = [];
         OrderOptions= Enum.GetNames(typeof(OrderBy)).ToList();
         SelectedOrderOption = OrderOptions.First();
-        _ = RefreshRecipes();
     }
 
     [RelayCommand]
-    private async Task RefreshRecipes()
+    public async Task RefreshRecipes()
     {
         try
         {
