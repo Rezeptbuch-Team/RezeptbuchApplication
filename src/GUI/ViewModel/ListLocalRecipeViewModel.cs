@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using ApplicationCore.Common.Types;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Model;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GUI.View;
@@ -12,6 +13,7 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
 {
     private readonly ILocalRecipeListService _localRecipeListService;
     private readonly IGetLocalRecipeService _getLocalRecipeService;
+    private readonly UploadService _uploadService;
     
     [ObservableProperty] 
     [NotifyCanExecuteChangedFor(nameof(OpenRecipeCommand))]
@@ -19,10 +21,11 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
     
     private bool RecipeSelected => SelectedRecipeEntry != null;
     
-    public ListLocalRecipeViewModel(ILocalRecipeListService recipeListService, IGetLocalRecipeService getLocalRecipeService, string appDataPath) : base(recipeListService, appDataPath)
+    public ListLocalRecipeViewModel(ILocalRecipeListService recipeListService, IGetLocalRecipeService getLocalRecipeService, UploadService uploadService,string appDataPath) : base(recipeListService, appDataPath)
     {
         _localRecipeListService = recipeListService;
         _getLocalRecipeService = getLocalRecipeService;
+        _uploadService = uploadService;
         _ = RefreshAvailableFilterOptions();
     }
     
@@ -47,5 +50,11 @@ public partial class ListLocalRecipeViewModel : ListRecipeViewModel
         #elif MACCATALYST
         Process.Start("open", AppDataPath);
         #endif
+    }
+
+    [RelayCommand]
+    private async Task UploadRecipe()
+    {
+        await _uploadService.UploadRecipe(SelectedRecipeEntry!.Hash, UploadType.UPLOAD);
     }
 }

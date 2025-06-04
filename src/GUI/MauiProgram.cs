@@ -46,6 +46,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IGetLocalRecipeService, GetLocalRecipeService>();
 		builder.Services.AddSingleton<ILocalRecipeListService, LocalRecipeListService>();
 		builder.Services.AddSingleton<IOnlineIdentificationService, OnlineIdentificationService>();
+		builder.Services.AddSingleton<UploadService>();
 
 		// add Views and ViewModels
 		builder.Services.AddSingleton<ListLocalRecipeView>();
