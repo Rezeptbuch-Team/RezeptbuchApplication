@@ -43,7 +43,7 @@ public class GetRecipeFromFileService(string appDataPath) : IGetRecipeFromFileSe
         {
             Hash = (string)root.Element("hash")!,
             Title = (string)root.Element("title")!,
-            ImagePath = (string)root.Element("imageName")!,
+            ImagePath = Path.Combine(appDataPath, (string)root.Element("imageName")!),
             Description = (string)root.Element("description")!,
             Servings = (int)root.Element("servings")!,
             CookingTime = (int)root.Element("cookingTime")!,
