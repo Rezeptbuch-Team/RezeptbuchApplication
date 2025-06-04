@@ -50,13 +50,17 @@
                                 <ViewCell
                                     x:DataType="types:Ingredient">
                                     <Grid
-                                        ColumnDefinitions="*, 40">
+                                        ColumnDefinitions="*, AUTO, AUTO">
                                         <Label
                                             Grid.Column="0"
                                             Text="{Binding Name}"/>
                                         <Label
                                             Grid.Column="1"
-                                            Text="{Binding Amount}"/>
+                                            Padding="0,0,5,0"
+                                            Text="{Binding Path=Amount, StringFormat='{0}'}"/>
+                                        <Label
+                                            Grid.Column="2"
+                                            Text="{Binding Unit}"/>
                                     </Grid>
                                 </ViewCell>
                             </DataTemplate>
